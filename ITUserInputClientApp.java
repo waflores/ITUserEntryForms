@@ -164,10 +164,11 @@ public class ITUserInputClientApp extends JApplet implements ActionListener {
 //		clientWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
+	@SuppressWarnings("resource")
 	public void start() {
 		Socket socket = null;
 		try {
-			socket = new Socket(this.serverAddress, 1234); // connect to server
+			socket = new Socket(this.serverAddress, 1234); // connect to server - let server close the socket for us
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 		}
