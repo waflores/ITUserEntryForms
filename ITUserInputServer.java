@@ -64,10 +64,18 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 //	private String pdfProgLocation = "\"C:\\Users\\Will\\Documents\\Visual Studio 2010\\Projects\\ITFormCreatorConsole\\ITFormCreatorConsole\\bin\\Debug" +
 //			"\\ITFOrmCreatorConsole.exe\"";
 //	private String pdfProgLocation ="\"C:\\Users\\srvflores\\Desktop\\ITFormCreatorConsole.exe\"";
-	private String pdfProgLocation = "\"E:\\ITFormCreatorConsole.exe\""; // Will's computer
-	private String serverDocumentDir = "E:\\"; //Will's computer
+	private String pdfProgLocation = "\"D:\\ITFormCreatorConsole.exe\""; // Will's computer
+	private String serverDocumentDir = "D:\\"; //Will's computer
 //	private String serverDocumentDir = "I:\\";
 //	private String pdfProgLocation = "\"I:\\ITFormCreatorConsole.exe\"";
+	
+	/* Server Admin Popup - called when the server admininstration option selected */
+	private JFrame serverAdmin = new JFrame("Server Administration Options");
+	private JPanel serverOpPanel = new JPanel();
+	private JTextField serverDocumentDirTxt = new JTextField(16);
+	private JTextField pdfProgLocationTxt = new JTextField(16);
+	private JButton serverDocDirBtn = new JButton("Open");
+	private JButton pdfProgLocBtn = new JButton("Open");
 	
 	/**
 	 * @param args doesn't have any cmdline args.
@@ -126,6 +134,16 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		outTextArea.setText("New User Input server is up at " +
 		    InetAddress.getLocalHost().getHostAddress() + " on port " +
 				ss.getLocalPort() + newLine);
+		
+		/* Set up the admin stuff on this app */
+		serverAdmin.getContentPane().add(serverOpPanel);
+		serverOpPanel.add(new JLabel("Document Location"));
+		serverOpPanel.add(serverDocumentDirTxt);
+		serverOpPanel.add(serverDocDirBtn);
+		serverOpPanel.add(new JLabel("PDF Generator Location"));
+		serverOpPanel.add(pdfProgLocationTxt);
+		serverOpPanel.add(pdfProgLocBtn);
+		/* End admin gui */
 		
 		serverWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		serverWindow.setVisible(true);
@@ -238,15 +256,12 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 			printToConsole("Closing server app...");
 			System.exit(0); // terminate app
 		}
+		/* Got to handle when an item is selected */
 	}
 	
 	private void createMonitorMenu() { // view different programs
 		JMenuItem item;
 		monitorOption = new JMenu("View");
-		
-		item = new JMenuItem("Administer Asset Database");
-		item.addActionListener(this);
-		monitorOption.add(item);
 		
 		item = new JMenuItem("Administer Form Database");
 		item.addActionListener(this);
