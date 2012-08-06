@@ -12,6 +12,7 @@ import java.io.*;
 //import java.util.TreeMap;
 //import java.util.concurrent.ConcurrentHashMap;
 import java.net.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -24,8 +25,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	 * So always start with this collection EMPTY!
 	 * (So this collection need not be saved to disk.)
 	 */ 
-//	private ConcurrentHashMap<String, DataOutputStream> clients =
-//			new ConcurrentHashMap<String, DataOutputStream>();
+	private ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
+			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
 	
 	/* "authorizedClients" key is associated with the clientname.
 	 * This collection is always initialized from a prepared
