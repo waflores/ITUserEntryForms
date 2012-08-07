@@ -1,7 +1,11 @@
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 
 
-public class ActiveConnectionObj {
+@SuppressWarnings("serial")
+public class ActiveConnectionObj implements Serializable {
 
 	private String userName;
 	private String compName;
@@ -10,8 +14,8 @@ public class ActiveConnectionObj {
 	public String getUserName() {
 		return userName;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserName(String username) {
+		this.userName = username;
 	}
 	public Date getLoginTime() {
 		return loginTime;
@@ -22,10 +26,20 @@ public class ActiveConnectionObj {
 	public String getCompName() {
 		return compName;
 	}
-	public void setCompName(String compName) {
-		this.compName = compName;
+	public void setCompName(String string) {
+		this.compName = string;
 	}
 	
+	public ActiveConnectionObj() {
+		setUserName(System.getProperty("user.name"));
+		try {
+			setCompName(InetAddress.getLocalHost().getHostName());
+		} catch (UnknownHostException e) {
+			setCompName(null);
+		}
+		setLoginTime(new Date());
+		
+	}
 	public ActiveConnectionObj (String userName, String compName, Date loginTime) {
 		setUserName(userName);
 		setCompName(compName);
@@ -34,7 +48,7 @@ public class ActiveConnectionObj {
 	
 	@Override
 	public String toString() {
-		return getUserName() + " at" + getCompName() + "on " + getLoginTime().toString();
+		return getUserName() + " at " + getCompName() + " on " + getLoginTime().toString();
 		
 	}
 }

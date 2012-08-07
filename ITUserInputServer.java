@@ -10,9 +10,9 @@
 import java.io.*;
 //import java.util.Collection;
 //import java.util.TreeMap;
-//import java.util.concurrent.ConcurrentHashMap;
 import java.net.*;
-import java.util.concurrent.ConcurrentHashMap;
+//import java.util.Date;
+//import java.util.concurrent.ConcurrentHashMap;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -25,8 +25,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	 * So always start with this collection EMPTY!
 	 * (So this collection need not be saved to disk.)
 	 */ 
-	private ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
-			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
+//	private ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
+//			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
 	
 	/* "authorizedClients" key is associated with the clientname.
 	 * This collection is always initialized from a prepared
@@ -51,7 +51,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	private JPanel txtPanel = new JPanel();
 	private JPanel btnPanel = new JPanel();
 
-	private JTextArea outTextArea = new JTextArea(15,30);
+	private JTextArea outTextArea = new JTextArea(21,36);
 	private JButton closeButton = new JButton("Close");
 	private String newLine = System.getProperty("line.separator");
 	private JScrollPane outScrollPane = new JScrollPane(outTextArea);
@@ -157,15 +157,16 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		Socket s = null;
 		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
-//		String clientName = "";
-//		String userid = null;
-//		String password = null;	
+//		ActiveConnectionObj activeUser = null;
+		
 		try {
 			s = ss.accept(); // wait for a client
 			new Thread(this).start(); // make a thread for the NEXT client
 			ois = new ObjectInputStream(s.getInputStream());
 			oos = new ObjectOutputStream(s.getOutputStream());
 			
+//			activeUser = new ActiveConnectionObj(s.getInetAddress(),  "Network", new Date());
+//			printToConsole(activeUser.toString() + " joined the session.");
 //			// validate connection
 //			if (firstMsg.equals("test")) {
 //				// good connection
