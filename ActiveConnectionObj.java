@@ -1,7 +1,10 @@
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
+
+import sun.rmi.log.ReliableLog.LogFile;
 
 
 @SuppressWarnings("serial")
@@ -10,7 +13,9 @@ public class ActiveConnectionObj implements Serializable {
 	private String userName;
 	private String compName;
 	private Date loginTime;
-	
+	private String connectionStatus; // User or Admin
+	public ArrayList<String> logFile;
+
 	public String getUserName() {
 		return userName;
 	}
@@ -38,17 +43,25 @@ public class ActiveConnectionObj implements Serializable {
 			setCompName(null);
 		}
 		setLoginTime(new Date());
-		
+		setConnectionStatus(""); // this is a bogus constructor
 	}
-	public ActiveConnectionObj (String userName, String compName, Date loginTime) {
+	
+	public ActiveConnectionObj (String userName, String compName, Date loginTime, String connectionStatus) {
 		setUserName(userName);
 		setCompName(compName);
 		setLoginTime(loginTime);
+		setConnectionStatus(connectionStatus);
 	}
 	
 	@Override
 	public String toString() {
 		return getUserName() + " at " + getCompName() + " on " + getLoginTime().toString();
 		
+	}
+	public String getConnectionStatus() {
+		return connectionStatus;
+	}
+	public void setConnectionStatus(String connectionStatus) {
+		this.connectionStatus = connectionStatus;
 	}
 }

@@ -12,7 +12,7 @@ import java.io.*;
 //import java.util.TreeMap;
 import java.net.*;
 //import java.util.Date;
-//import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,27 +20,14 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import javax.swing.*;
 
+@SuppressWarnings("unused")
 public class ITUserInputServer  implements Runnable, ActionListener {
 	/* "clients" key is the usernames of WHO IS NOW using the program.
 	 * So always start with this collection EMPTY!
 	 * (So this collection need not be saved to disk.)
 	 */ 
-//	private ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
-//			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
-	
-	/* "authorizedClients" key is associated with the clientname.
-	 * This collection is always initialized from a prepared
-	 * .ser file, and is NOT updated by the server.
-	 * (So this collection need not be saved to disk.)
-	 */
-//	private TreeMap<String, String> authorizedClients;
-	
-	/* "passwords" key is associated with the password. 
-	 * This collection is always restored from disk.
-	 * This collection is updated by 1st-time joiners,
-	 * and it must be saved to disk whenever it's changed.
-	 */
-//	private ConcurrentHashMap <String, String> passwords;
+	private ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
+			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
 	
 	private int portNumber = 1234;
 	private ServerSocket ss;
@@ -56,6 +43,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	private String newLine = System.getProperty("line.separator");
 	private JScrollPane outScrollPane = new JScrollPane(outTextArea);
 	private JScrollBar vsb = outScrollPane.getVerticalScrollBar();
+	
 	/* Menu Bar */
 //	private JMenuBar mainBar = new JMenuBar();
 	private JMenu serverOptions; // tools
@@ -106,14 +94,11 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		serverWindow.setSize(450, 450);
 		serverWindow.setLocation(250,250);
 		
-//		btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));
-		
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
 		
 		serverWindow.getContentPane().add(mainPanel, "Center");
 		serverWindow.getContentPane().add(btnPanel, "South");
 		mainPanel.add(txtPanel);
-//		mainPanel.add(btnPanel);
 
 		/* Create menu bar */
 		createMonitorMenu();
@@ -157,7 +142,6 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		Socket s = null;
 		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
-//		ActiveConnectionObj activeUser = null;
 		
 		try {
 			s = ss.accept(); // wait for a client
@@ -165,18 +149,23 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 			ois = new ObjectInputStream(s.getInputStream());
 			oos = new ObjectOutputStream(s.getOutputStream());
 			
-//			activeUser = new ActiveConnectionObj(s.getInetAddress(),  "Network", new Date());
-//			printToConsole(activeUser.toString() + " joined the session.");
-//			// validate connection
-//			if (firstMsg.equals("test")) {
-//				// good connection
-//			}
-//			else {
+			/* The users logging on to the server need to send as their first message an Active connection object.
+			 * 
+			 */
+			
+			Object msg = ois.readObject();
+			if (msg instanceof ActiveConnectionObj) {
+				// Validate connection & save their connection information
+				clients.put((ActiveConnectionObj) msg, oos);
+				printToConsole(((ActiveConnectionObj) msg).getUserName() + " is joining the server.");
+			}
+			else {
 //				oos.writeUTF("Invalid Protocol. ");
-//				oos.close();
-//				printToConsole("Invalid 1st message" + firstMsg);
-//				return; // kill thread client
-//			}
+				oos.close();
+				printToConsole("Invalid 1st message from " + s.getInetAddress());
+				return; // kill thread client
+			}
+
 		}
 		catch (Exception e) {
 			printToConsole("Client connection failure: " + e);
@@ -210,7 +199,6 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 						printToConsole("Waiting for user authentication...");
 					} 
 					catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} 
 					catch (IOException ioe) { 
@@ -230,18 +218,11 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 				}
 			} // End While
 		}
-		catch (ClassNotFoundException cnfe) {
-			printToConsole(cnfe.toString());
-		} 
 		catch (IOException ioe) {
-			// TODO Auto-generated catch block
-			printToConsole(ioe.toString());
-		} catch (AddressException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printToConsole("Someone's leaving.");
+		}
+		catch (Exception e) { // What happened?
+			printToConsole(e.getMessage());
 		}
 	}// End run()
 	
@@ -253,7 +234,6 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	}
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		// TODO Auto-generated method stub
 		if (ae.getSource() == closeButton) {
 			printToConsole("Closing server app...");
 			System.exit(0); // terminate app

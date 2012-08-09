@@ -1,15 +1,19 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Date;
 import javax.mail.Session;
 import javax.swing.*;
+
 // how to sign apps
 // http://java.sun.com/developer/onlineTraining/Programming/JDCBook/signed.html#1.1
+
 @SuppressWarnings({ "unused", "serial" })
-public class ITUserInputClientApp extends JApplet implements ActionListener {
+public class ITUserInputClientApp extends JApplet implements ActionListener, Runnable, WindowListener {
 	// Form GUI
 //	private JFrame clientWindow = new JFrame("New User Input Client");
 	private JPanel mainPanel = new JPanel();
@@ -62,13 +66,14 @@ public class ITUserInputClientApp extends JApplet implements ActionListener {
 //	private JButton windowSizeButton = new JButton("WindowSize");
 	
 	/* Our Data */
-//	private String clientid = System.getProperty("user.name"); // Get the person's user name
-//	private String compname = InetAddress.getLocalHost().getCanonicalHostName(); // log computer name
+	private String clientid = System.getProperty("user.name"); // Get the person's user name
+	private String compname; // log computer name
 	
 	/* Network Streams */
 	private String serverAddress; 
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
+	private Socket socket;
 	
 	/* Email GUI*/
 	private JLabel emailLabel = new JLabel("Email address:");
@@ -164,36 +169,22 @@ public class ITUserInputClientApp extends JApplet implements ActionListener {
 //		clientWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
-	@SuppressWarnings("resource")
 	public void start() {
-		Socket socket = null;
 		try {
 			socket = new Socket(this.serverAddress, 1234); // connect to server - let server close the socket for us
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
+			this.compname =  InetAddress.getLocalHost().getCanonicalHostName();
+			oos.writeObject(new ActiveConnectionObj(clientid, compname, new Date(), "Client"));
 		}
 		catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Can't connect to server. Restart App. " + e.toString());
 			return;
 		}
 	}
-	/**
-	 * @param args
-	 */
-//	public static void main(String[] args) {
-//		String whereToConnect = JOptionPane.showInputDialog("Where to connect?", "localhost");
-//			try {
-//				new ITUserInputClientApp(whereToConnect);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			};
-//				
-//	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		// TODO Auto-generated method stub
 		if (ae.getSource() == clearButton) {
 			// Popup and ask before making changes
 			int response = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to clear the form?", 
@@ -231,7 +222,6 @@ public class ITUserInputClientApp extends JApplet implements ActionListener {
 			try {
 				oos.writeObject(new RequestAuth(user, pass, this.filename));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				JOptionPane.showMessageDialog(null, e.toString());
 			}
 		}
@@ -274,7 +264,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener {
 			} catch (Exception e) {
 				// Code the part where the server's down and you're sending the info it
 				JOptionPane.showMessageDialog(null, "Restart application or call IT.", "Connection to server lost.", JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
+				e.printStackTrace(); // TODO Take out for production
 			}
 			// Clear the form when we're done and expect a gui interface to send us a link to the pdf of the form
 			clearForm();
@@ -311,4 +301,32 @@ public class ITUserInputClientApp extends JApplet implements ActionListener {
 		regEmp.setSelected(true);
 		empIsNotRehire.setSelected(true);
 	}
+
+	@Override
+	public void run() {/* Call to receive method here. */}
+
+	@Override // Not Implemented
+	public void windowActivated(WindowEvent arg0) {}
+
+	@Override // Not Implemented
+	public void windowClosed(WindowEvent arg0) {}
+
+	@Override 
+	public void windowClosing(WindowEvent arg0) {
+		try {
+			socket.close(); // break connection to server
+		} catch (Exception e) {/* Don't do anything */}
+	}
+
+	@Override // Not Implemented
+	public void windowDeactivated(WindowEvent arg0) {}
+	
+	@Override // Not Implemented
+	public void windowDeiconified(WindowEvent arg0) {}
+	
+	@Override // Not Implemented
+	public void windowIconified(WindowEvent arg0) {}
+	
+	@Override // Not Implemented
+	public void windowOpened(WindowEvent arg0) {}
 }
