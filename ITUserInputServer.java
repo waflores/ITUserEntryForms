@@ -187,34 +187,6 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 				if (msg instanceof NewUser) {
 					NewUser user = (NewUser) msg;
 					printToConsole(user.toString()); // trace
-					String command = getPdfProgLocation() +" n_" + getServerDocumentDir() + user.getFileName() +"_";
-					Process createForm = Runtime.getRuntime().exec(command + user.toString());
-					
-					try {
-						Integer exitStatus = new Integer(createForm.waitFor());
-						printToConsole(exitStatus.toString());
-						FormStatus fs = new FormStatus(exitStatus, user.getFileName());
-						formIsGenerated = true;
-						oos.writeObject(fs); // write the object to client, now for pdf email
-						printToConsole("Waiting for user authentication...");
-					} 
-					catch (InterruptedException e) {
-						e.printStackTrace();
-					} 
-					catch (IOException ioe) { 
-						printToConsole("Someone is leaving.");
-						printToConsole(ioe.toString());
-						// at some point there needs to be something here to keep track
-						// of logged on ppl
-					} 	
-				} // End if
-				else if (formIsGenerated && msg instanceof RequestAuth) {
-					RequestAuth ra = (RequestAuth) msg;
-					// update filename with server location
-					ra.updateFilename(serverDocumentDir + ra.getFilename());
-					printToConsole("Sending message to admin.");
-					ra.Authenticate();
-					ra.sendMessageToUser();
 				}
 			} // End While
 		}
