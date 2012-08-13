@@ -56,6 +56,13 @@ public class ActiveConnectionObj implements Serializable {
 		return getUserName() + " at " + getCompName() + " on " + getLoginTime().toString();
 		
 	}
+	public void appendToLog(String action) {
+//		this.logFile.add(action + " at " + new Date());
+	}
+	public void appendToAddedUsers(NewUser user) {
+//		this.inputedUsers.add(user);
+	}
+	
 	public String getConnectionStatus() {
 		return connectionStatus;
 	}

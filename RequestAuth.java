@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
+//import javax.mail.PasswordAuthentication;
 import javax.mail.Transport;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
@@ -19,12 +19,12 @@ public class RequestAuth implements /*ActionListener,*/ Serializable/*, Runnable
 	private String username;
 //	public boolean authenticated;
 	private Session session;
-	private char[] password;
+//	private char[] password;
 	
 	public RequestAuth(String username,char[] password, String file) {
 		this.file = file;
 		this.username = username;
-		this.password = password;
+//		this.password = password;
 	}
 
 //	@Override
@@ -60,24 +60,19 @@ public class RequestAuth implements /*ActionListener,*/ Serializable/*, Runnable
 	
 	public void Authenticate () {
 		Properties props = new Properties();
-		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.auth", "false");
 		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", "smtp.gmail.com");
-		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.host", "mail.rtp.local");
+		props.put("mail.smtp.port", "25");
 		/* Use an authenticator to connect to gmail */
-		final String pass = new String(password);
-		final String user = this.username;
+//		final String pass = new String(password);
+//		final String user = this.username;
 		
-		Session session = Session.getInstance(props,
-		  new javax.mail.Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(user, pass);
-			}
-		  });
+		Session session = Session.getInstance(props, null);
 		// clear out password when done
-		for (int i = 0; i < password.length; i++) {
-			password[i] = '0';
-		}
+//		for (int i = 0; i < password.length; i++) {
+//			password[i] = '0';
+//		}
 		this.session = session;
 	}
 	

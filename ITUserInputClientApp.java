@@ -176,6 +176,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 			ois = new ObjectInputStream(socket.getInputStream());
 			this.compname =  InetAddress.getLocalHost().getCanonicalHostName();
 			oos.writeObject(new ActiveConnectionObj(clientid, compname, new Date(), "Client"));
+			new Thread(this).start();
 		}
 		catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Can't connect to server. Restart App. " + e.toString());
@@ -215,12 +216,12 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 		}
 		if (ae.getSource() == EsubmitBtn){
 			final String user = emailField.getText();
-			char[] pass = passwordField.getPassword();
+//			char[] pass = passwordField.getPassword();
 			emailFrame.dispose();
-	
+			// TODO fix this to work with local smtp server
 			// Get authentication
 			try {
-				oos.writeObject(new RequestAuth(user, pass, this.filename));
+				oos.writeObject(new RequestAuth(user, null, this.filename));
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null, e.toString());
 			}
@@ -229,7 +230,6 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 		
 	}
 	private void processUser () {
-		
 		/* Get the input from the form */
 		String l_name = lastNametxt.getText().trim();
 		String f_name = firstNametxt.getText().trim();
@@ -254,33 +254,22 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 				/* Send it to the server in an Object and receive a payload to process */
 				oos.writeObject(u);
 				
-				// get form status
-				Object fs = ois.readObject();
-				
-				if (((FormStatus) fs).getStatusID() == 1) {
-					/* Get authentication request */
-					emailIt(u.getFileName());
-				}
 			} catch (Exception e) {
 				// Code the part where the server's down and you're sending the info it
 				JOptionPane.showMessageDialog(null, "Restart application or call IT.", "Connection to server lost.", JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace(); // TODO Take out for production
 			}
-			// Clear the form when we're done and expect a gui interface to send us a link to the pdf of the form
-			clearForm();
 		}	
 	}
 	
-	private void emailIt(String filename) {
+	private void emailIt() {
 		// call the email gui
 		emailFrame.getContentPane().add(emailPanel, "Center");
 		emailPanel.add(emailLabel);
 		emailPanel.add(emailField);
-		emailPanel.add(passwordLabel);
-		emailPanel.add(passwordField);
 		emailPanel.add(statusMsgs);
 		emailPanel.add(EsubmitBtn);
-		this.filename = filename;
+//		this.filename = filename;
 		EsubmitBtn.addActionListener(this);
 		emailFrame.setSize(300, 125);
 		emailFrame.setVisible(true);
@@ -303,8 +292,36 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 	}
 
 	@Override
-	public void run() {/* Call to receive method here. */}
-
+	public void run() {receive();}
+	
+	// Multithreaded receive loop
+	private void receive() {
+		try {
+			while (true) {
+				Object serverResponse = ois.readObject();
+				// get form status
+				if (serverResponse instanceof FormStatus) {
+					FormStatus fs = (FormStatus) serverResponse;
+					int serverStatus = fs.getStatusID();
+					
+					if (serverStatus == UserStatusID.FORM_RECIEVED) { // form received code
+						emailIt();
+					}
+					else if (serverStatus == UserStatusID.EMAIL_SENT) { // email sent code
+						clearForm();
+						JOptionPane.showMessageDialog(null, "Form sent to Network Administrator.", "User Added!", JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "Form not sent to server, try again.", "Error processing form.", JOptionPane.WARNING_MESSAGE);
+					}
+				}
+			}
+		}
+		catch (IOException ioe) {
+		} catch (ClassNotFoundException cnfe) {
+		}
+	}
+	
 	@Override // Not Implemented
 	public void windowActivated(WindowEvent arg0) {}
 

@@ -5,19 +5,30 @@ import java.io.Serializable;
  */
 
 @SuppressWarnings("serial")
-public class FormStatus implements Serializable {
+public class FormStatus implements Serializable, UserStatusID {
 	private Integer statusid;
 	private String filename;
 	
-	public FormStatus(Integer status, String filename) {
+	public FormStatus(Integer status) {
 		setStatusID(status);
-		setFilename(filename);
+//		setFilename(filename);
 	}
 	
+	@Override
 	public String getStatus() {
 		int id = getStatusID();
 		
 		switch(id){
+		case UserStatusID.EMAIL_SENT:
+			break;
+		case UserStatusID.EMAIL_NOTSENT:
+			break;
+		case UserStatusID.FORM_RECIEVED:
+			break;
+		case UserStatusID.FORM_NOTRECEIVED:
+			break;
+		case UserStatusID.FATAL_ERROR:
+			break;
 		default:
 			break;
 		}

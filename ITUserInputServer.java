@@ -11,6 +11,7 @@ import java.io.*;
 //import java.util.Collection;
 //import java.util.TreeMap;
 import java.net.*;
+import java.util.*;
 //import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.awt.event.ActionEvent;
@@ -29,6 +30,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	private ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
 			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
 	
+	private Vector<NewUser> addedUsers = new Vector<NewUser>();
+	
 	private int portNumber = 1234;
 	private ServerSocket ss;
 	
@@ -45,18 +48,11 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	private JScrollBar vsb = outScrollPane.getVerticalScrollBar();
 	
 	/* Menu Bar */
-//	private JMenuBar mainBar = new JMenuBar();
 	private JMenu serverOptions; // tools
 	private JMenu monitorOption; // view
 	
-	
-//	private String pdfProgLocation = "\"C:\\Users\\Will\\Documents\\Visual Studio 2010\\Projects\\ITFormCreatorConsole\\ITFormCreatorConsole\\bin\\Debug" +
-//			"\\ITFOrmCreatorConsole.exe\"";
-//	private String pdfProgLocation ="\"C:\\Users\\srvflores\\Desktop\\ITFormCreatorConsole.exe\"";
 	private String pdfProgLocation = "\"D:\\ITFormCreatorConsole.exe\""; // Will's computer
 	private String serverDocumentDir = "D:\\"; //Will's computer
-//	private String serverDocumentDir = "I:\\";
-//	private String pdfProgLocation = "\"I:\\ITFormCreatorConsole.exe\"";
 	
 	/* Server Admin Popup - called when the server admininstration option selected */
 	private JFrame serverAdmin = new JFrame("Server Administration Options");
@@ -142,22 +138,25 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		Socket s = null;
 		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
+		ActiveConnectionObj aco = null;
 		
+		/* Connection establishing block */
 		try {
 			s = ss.accept(); // wait for a client
 			new Thread(this).start(); // make a thread for the NEXT client
 			ois = new ObjectInputStream(s.getInputStream());
 			oos = new ObjectOutputStream(s.getOutputStream());
 			
-			/* The users logging on to the server need to send as their first message an Active connection object.
-			 * 
-			 */
-			
+			/* The users logging on to the server need to send as their first message an Active connection object. */
+			// TODO write to log that a connection was made
 			Object msg = ois.readObject();
+			aco = (ActiveConnectionObj) msg; // cast the message from client to ACO but don't test this objref
+			
 			if (msg instanceof ActiveConnectionObj) {
 				// Validate connection & save their connection information
-				clients.put((ActiveConnectionObj) msg, oos);
-				printToConsole(((ActiveConnectionObj) msg).getUserName() + " is joining the server.");
+				clients.put(aco, oos);
+				aco.appendToLog("Logged into server ");
+				printToConsole(aco.getUserName() + " is joining the server.");
 			}
 			else {
 //				oos.writeUTF("Invalid Protocol. ");
@@ -169,6 +168,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		}
 		catch (Exception e) {
 			printToConsole("Client connection failure: " + e);
+			// TODO Log that there was a server failure
 			if (s.isConnected()) {
 				try {
 					s.close(); // hang up
@@ -177,25 +177,49 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 					// Do nothing, because the client already hung up
 				}
 			}
-		}
+		} /* End Connection establishing block */
+		
 		
 		// Barebones receive loop
 		try {
-			boolean formIsGenerated = false;
+			boolean userInputed = false;
 			while (true) {
 				Object msg = ois.readObject();
 				if (msg instanceof NewUser) {
 					NewUser user = (NewUser) msg;
+					aco.appendToAddedUsers(user);
+					aco.appendToLog("Added a user ");
 					printToConsole(user.toString()); // trace
+					/* Form received */
+					oos.writeObject(new FormStatus(UserStatusID.FORM_RECIEVED));
+					userInputed = true;
 				}
+				if (userInputed && msg instanceof RequestAuth) {
+					RequestAuth ra = (RequestAuth) msg;
+					// Sent the request to the admin
+					printToConsole("Sending message to admin.");
+					ra.Authenticate();
+					ra.sendMessageToUser();
+					/* Sent the email */
+					oos.writeObject(new FormStatus(UserStatusID.EMAIL_SENT));
+					userInputed = false; // reset for next user to inputed
+				}
+				
 			} // End While
 		}
-		catch (IOException ioe) {
+		catch (IOException ioe) { // Leave processing
+			// TODO Write to log what they did
+			aco.appendToLog("Logged off server ");
+			// Serialize log here!
 			printToConsole("Someone's leaving.");
+			clients.remove(aco);
+			return; // gotta go!
 		}
 		catch (Exception e) { // What happened?
+			aco.appendToLog("Fatal error: " + e.getMessage());
+			clients.remove(aco);
 			printToConsole(e.getMessage());
-		}
+		} /* End receive loop */
 	}// End run()
 	
 	private void printToConsole (String msg) {
