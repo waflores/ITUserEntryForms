@@ -221,7 +221,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 			// TODO fix this to work with local smtp server
 			// Get authentication
 			try {
-				oos.writeObject(new RequestAuth(user, null, this.filename));
+				oos.writeObject(new RequestAuth(user));
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null, e.toString());
 			}
@@ -322,18 +322,18 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 		}
 	}
 	
-	@Override // Not Implemented
-	public void windowActivated(WindowEvent arg0) {}
-
-	@Override // Not Implemented
-	public void windowClosed(WindowEvent arg0) {}
-
 	@Override 
 	public void windowClosing(WindowEvent arg0) {
 		try {
 			socket.close(); // break connection to server
 		} catch (Exception e) {/* Don't do anything */}
 	}
+	
+	@Override // Not Implemented
+	public void windowActivated(WindowEvent arg0) {}
+
+	@Override // Not Implemented
+	public void windowClosed(WindowEvent arg0) {}
 
 	@Override // Not Implemented
 	public void windowDeactivated(WindowEvent arg0) {}

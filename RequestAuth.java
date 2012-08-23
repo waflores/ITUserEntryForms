@@ -20,7 +20,14 @@ public class RequestAuth implements /*ActionListener,*/ Serializable/*, Runnable
 //	public boolean authenticated;
 	private Session session;
 //	private char[] password;
+	private String newLine = System.getProperty("line.separator");
+	private NewUser newUser = null;
 	
+	public RequestAuth(String username) {
+		this.username = username;
+	}
+	
+	@Deprecated
 	public RequestAuth(String username,char[] password, String file) {
 		this.file = file;
 		this.username = username;
@@ -96,11 +103,94 @@ public class RequestAuth implements /*ActionListener,*/ Serializable/*, Runnable
 			mp.addBodyPart(mbp2);
 			message.setContent(mp);
 		}
+		else if (newUser != null) {
+			String msgToSend = "Request sent to Network Administrator for the following user: " + newLine;
+			
+			String firstName = newUser.getF_name();
+			String lastName = newUser.getL_name(); 
+			String prefName = newUser.getPref_name(); 
+			String midName = newUser.getM_initials(); 
+			String title = newUser.getTitle(); 
+			String manager = newUser.getManager(); 
+			String dept = newUser.getDept(); 
+			String employeeID = newUser.getDiosynth_empID(); 
+			String location = newUser.getEmp_location(); 
+			String startDate = newUser.getEmp_startDate(); 
+			String empRehire = newUser.isEmp_rehire(); 
+			String empStatus = newUser.isEmp_status();
+			String retVal = null;
+			
+			if (firstName.length() != 0) {
+				retVal = firstName;
+				msgToSend += "First Name: " + retVal + newLine;
+			}
+			
+			if (midName.length() != 0) {
+				retVal = midName;
+				msgToSend += "Middle Initials: " + retVal + newLine;
+			}
+			
+			if (lastName.length() != 0) {
+				retVal = lastName;
+				msgToSend += "Last Name: " + retVal + newLine;
+			}
+			
+			if (prefName.length() != 0) {
+				retVal = prefName;
+				msgToSend += "Preferred Name: " + retVal + newLine;
+			}
+			
+			if (title.length() != 0) {
+				retVal = title;
+				msgToSend += "Title: " + retVal + newLine;
+			}
+			
+			if (manager.length() != 0) {
+				retVal = manager;
+				msgToSend += "Manager: " + retVal + newLine;
+			}
+			
+			if (dept.length() != 0) {
+				retVal = dept;
+				msgToSend += "Department: " + retVal + newLine;
+			}
+			
+			if (employeeID.length() != 0) {
+				retVal = employeeID;
+				msgToSend += "Employee ID:" + retVal + newLine;
+			}
+			
+			if (location.length() != 0) {
+				retVal = location;
+				msgToSend +="Location: " + retVal + newLine;
+			}
+			
+			if (startDate.length() != 0) {
+				retVal = startDate;
+				msgToSend += "Start Date: " + retVal + newLine;
+			}
+			
+			if (empRehire.length() != 0) {
+				retVal = empRehire;
+				msgToSend += "Is the employee is a rehire? " + retVal + newLine;
+			}
+			
+			if (empStatus.length() != 0) {
+				retVal = empStatus;
+				msgToSend += "Employee Status: " + retVal + newLine;
+			}
+			
+			message.setText(msgToSend);
+		}
 		else {
 			message.setText("Request sent to Network Administrator.");
 		}
 		Transport.send(message);
 		System.out.println("Actually sent message.");
+	}
+	
+	public void addUser(NewUser newUser) {
+		this.newUser = newUser;
 	}
 	
 	public void updateFilename(String filename) {

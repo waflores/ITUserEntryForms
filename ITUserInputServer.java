@@ -183,10 +183,11 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		// Barebones receive loop
 		try {
 			boolean userInputed = false;
+			NewUser user = null;
 			while (true) {
 				Object msg = ois.readObject();
 				if (msg instanceof NewUser) {
-					NewUser user = (NewUser) msg;
+					user = (NewUser) msg;
 					aco.appendToAddedUsers(user);
 					aco.appendToLog("Added a user ");
 					printToConsole(user.toString()); // trace
@@ -199,10 +200,12 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 					// Sent the request to the admin
 					printToConsole("Sending message to admin.");
 					ra.Authenticate();
+					ra.addUser(user);
 					ra.sendMessageToUser();
 					/* Sent the email */
 					oos.writeObject(new FormStatus(UserStatusID.EMAIL_SENT));
 					userInputed = false; // reset for next user to inputed
+					user = null; // reset for next user to be input
 				}
 				
 			} // End While
