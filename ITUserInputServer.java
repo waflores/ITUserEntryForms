@@ -50,6 +50,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	/* Menu Bar */
 	private JMenu serverOptions; // tools
 	private JMenu monitorOption; // view
+	private JMenuItem adminDatabaseItem;
+	private JMenuItem viewConnectionsItem;
 	
 	private String pdfProgLocation = "\"D:\\ITFormCreatorConsole.exe\""; // Will's computer
 	private String serverDocumentDir = "D:\\"; //Will's computer
@@ -233,28 +235,35 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	}
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getSource() == closeButton) {
-			printToConsole("Closing server app...");
-			System.exit(0); // terminate app
+		try {
+			if (ae.getSource() == closeButton) {
+				printToConsole("Closing server app...");
+				System.exit(0); // terminate app
+			}
+			
+			/* Got to handle when an item is selected */
+			if (ae.getSource() == viewConnectionsItem) {
+				new ConnectionViewer(clients);
+			}
+			if (ae.getSource() == adminDatabaseItem) {
+			}
 		}
-		/* Got to handle when an item is selected */
+		catch (Exception e) {}
 	}
 	
 	private void createMonitorMenu() { // view different programs
-		JMenuItem item;
 		monitorOption = new JMenu("View");
 		
-		item = new JMenuItem("Administer Form Database");
-		item.addActionListener(this);
-		monitorOption.add(item);
+		adminDatabaseItem = new JMenuItem("Administer Form Database");
+		adminDatabaseItem.addActionListener(this);
+		monitorOption.add(adminDatabaseItem);
 	}
 	private void createServerMenu() { // tools
-		JMenuItem item;
 		serverOptions = new JMenu("Tools");
 		
-		item = new JMenuItem("View Connected Users...");
-		item.addActionListener(this);
-		serverOptions.add(item);
+		viewConnectionsItem = new JMenuItem("View Connected Users...");
+		viewConnectionsItem.addActionListener(this);
+		serverOptions.add(viewConnectionsItem);
 		
 	}
 
