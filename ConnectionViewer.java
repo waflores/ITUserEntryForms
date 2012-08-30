@@ -2,9 +2,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.*;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.*;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,7 +24,7 @@ import javax.swing.event.ListSelectionListener;
  * 
  * Created on August 24, 2012
  */
-
+@SuppressWarnings("unused")
 public class ConnectionViewer implements ActionListener, ListSelectionListener, Runnable {
 	/* Main display window */
 	private JFrame dispWindow = new JFrame("Connection Viewer"); // the viewing window :)
@@ -76,15 +78,48 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 		
 		/* Exit the program when the GUI is closed */
 		dispWindow.setVisible(true);
-		dispWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		dispWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
 	public void updateConnectionList(ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> connections) {
 		clients = connections; // update the list of clients
 		
 		// update active connection objects
-		Vector<ActiveConnectionObj> vAco = (Vector<ActiveConnectionObj>) connections.keys();
+		Vector<String> dataL = new Vector<String>();
 		
+		Enumeration <ActiveConnectionObj> people = clients.keys();
+		Method userMethod;
+		Object exeObj;
+		Class<?> classObject;
+		for (; people.hasMoreElements(); people.nextElement()) {
+			try {
+				classObject = people.getClass();
+				exeObj = classObject.newInstance();
+				userMethod = classObject.getMethod("getUserName");
+				String names = (String) userMethod.invoke(exeObj, new Object[0]); 
+				dataL.add(names);
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		connList.setListData(dataL);
 	}
 	
 	@Override

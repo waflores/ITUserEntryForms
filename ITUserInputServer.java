@@ -248,7 +248,9 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 			if (ae.getSource() == adminDatabaseItem) {
 			}
 		}
-		catch (Exception e) {}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void createMonitorMenu() { // view different programs
@@ -258,6 +260,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		adminDatabaseItem.addActionListener(this);
 		monitorOption.add(adminDatabaseItem);
 	}
+	
 	private void createServerMenu() { // tools
 		serverOptions = new JMenu("Tools");
 		
