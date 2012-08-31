@@ -42,6 +42,7 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 	private JScrollPane propertiesListPane = new JScrollPane(propertiesList);
 	private JButton killConnectionButton = new JButton("Disconnect User");
 	private String selectedUser = null; // method name from JList
+	private ObjectOutputStream ACOoos = null;
 	
 	public ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> clients = 
 			new ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>>();
@@ -127,6 +128,8 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 //			Object clientOOS = userInQuestion.values();
 			ActiveConnectionObj clientACO = (ActiveConnectionObj) clientACOArray[0];
 			
+			ACOoos = userInQuestion.get(clientACO);
+			
 			Vector<String> propData = new Vector<String>();
 			
 			propData.add(clientACO.getUserName());
@@ -139,7 +142,11 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 			
 		}
 		if (ae.getSource() == killConnectionButton) {
-			
+			try {
+				ACOoos.close();
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(propertiesWindow, e.getMessage());
+			}
 		}
 	}
 
