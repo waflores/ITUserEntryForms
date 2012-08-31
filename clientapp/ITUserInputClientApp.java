@@ -1,17 +1,26 @@
+package clientapp;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Date;
 import javax.mail.Session;
 import javax.swing.*;
+import helpertools.*; // custom import 
 
-@SuppressWarnings({ "unused" })
-public class ITUserInputClient implements ActionListener {
+// how to sign apps
+// http://java.sun.com/developer/onlineTraining/Programming/JDCBook/signed.html#1.1
+
+@SuppressWarnings({ "unused", "serial" })
+public class ITUserInputClientApp extends JApplet implements ActionListener, Runnable, WindowListener {
 	// Form GUI
-	private JFrame clientWindow = new JFrame("New User Input Client");
+//	private JFrame clientWindow = new JFrame("New User Input Client");
 	private JPanel mainPanel = new JPanel();
+	private JPanel topPanel = new JPanel();
 	private JPanel bottomPanel = new JPanel();
 	
 	/* Radiobuttons */
@@ -50,7 +59,7 @@ public class ITUserInputClient implements ActionListener {
 	private JTextField empIDtxt = new JTextField (8);
 	
 	/* Selection Items */
-	private String[] comboBoxItem = {"THC", "RTP", "WES", "KCL", "D&I"};
+	private String[] comboBoxItem = {"THC", "RTP", "WES", "D&I"};
 	private JComboBox<?> empLoc = new JComboBox<Object>(comboBoxItem);
 	
 	/* Control Buttons */
@@ -61,12 +70,13 @@ public class ITUserInputClient implements ActionListener {
 	
 	/* Our Data */
 	private String clientid = System.getProperty("user.name"); // Get the person's user name
-	private String compname = InetAddress.getLocalHost().getCanonicalHostName(); // log computer name
+	private String compname; // log computer name
 	
 	/* Network Streams */
 	private String serverAddress; 
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
+	private Socket socket;
 	
 	/* Email GUI*/
 	private JLabel emailLabel = new JLabel("Email address:");
@@ -80,53 +90,56 @@ public class ITUserInputClient implements ActionListener {
 	private String filename;
 	
 
-	public ITUserInputClient(String serverAddress) throws Exception {
+	public void init() {
 		/* Start building GUI */
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		this.serverAddress = serverAddress;
+		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+
+		// Get Server address
+		serverAddress = getCodeBase().getHost();
+		if ((serverAddress == null) || (serverAddress.length() == 0)) serverAddress = "localhost"; // to run with appletviewer
 		
-		clientWindow.getContentPane().add(mainPanel, "Center");
-		clientWindow.getContentPane().add(bottomPanel, "South");
+//		clientWindow.getContentPane().add(topPanel, "Center");
+//		clientWindow.getContentPane().add(bottomPanel, "South");
 		
 		
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 //		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 		
 		// Start adding things to the gui
-		mainPanel.add(firstName);
-		mainPanel.add(firstNametxt);
-		mainPanel.add(midName);
-		mainPanel.add(midNametxt);
-		mainPanel.add(lastName);
-		mainPanel.add(lastNametxt);
-		mainPanel.add(prefName);
-		mainPanel.add(prefNametxt);
-		mainPanel.add(empID);
-		mainPanel.add(empIDtxt);
-		mainPanel.add(empTitle);
-		mainPanel.add(empTitletxt);
-		mainPanel.add(empManager);
-		mainPanel.add(empManagertxt);
-		mainPanel.add(empLocation);
-		mainPanel.add(empLoc); // a dropdown menu
-		mainPanel.add(empDept);
-		mainPanel.add(empDepttxt);
-		mainPanel.add(empStartDate);
-		mainPanel.add(empStartDatetxt);
+		topPanel.add(firstName);
+		topPanel.add(firstNametxt);
+		topPanel.add(midName);
+		topPanel.add(midNametxt);
+		topPanel.add(lastName);
+		topPanel.add(lastNametxt);
+		topPanel.add(prefName);
+		topPanel.add(prefNametxt);
+		topPanel.add(empID);
+		topPanel.add(empIDtxt);
+		topPanel.add(empTitle);
+		topPanel.add(empTitletxt);
+		topPanel.add(empManager);
+		topPanel.add(empManagertxt);
+		topPanel.add(empLocation);
+		topPanel.add(empLoc); // a dropdown menu
+		topPanel.add(empDept);
+		topPanel.add(empDepttxt);
+		topPanel.add(empStartDate);
+		topPanel.add(empStartDatetxt);
 		empStartDatetxt.setEditable(false); // Just display whatever the user chooses as a date
-		mainPanel.add(selectDate); // Instantiate datePicker
+		topPanel.add(selectDate); // Instantiate datePicker
 		selectDate.addActionListener(this);
 		
 //		rightPanel.add(Box.createHorizontalStrut(15)); // create some space in the GUI
-		mainPanel.add(Box.createHorizontalStrut(5));
+		topPanel.add(Box.createHorizontalStrut(5));
 		
-		mainPanel.add(empRehire);
-		mainPanel.add(empIsNotRehire);
-		mainPanel.add(empIsRehire);	
-		mainPanel.add(Box.createHorizontalStrut(15)); // create some space in the GUI
-		mainPanel.add(empStatus);
-		mainPanel.add(regEmp);
-		mainPanel.add(tempContract);
+		topPanel.add(empRehire);
+		topPanel.add(empIsNotRehire);
+		topPanel.add(empIsRehire);	
+		topPanel.add(Box.createHorizontalStrut(15)); // create some space in the GUI
+		topPanel.add(empStatus);
+		topPanel.add(regEmp);
+		topPanel.add(tempContract);
 		
 		// radio button functionality
 		btnGroup1.add(regEmp);
@@ -140,67 +153,60 @@ public class ITUserInputClient implements ActionListener {
 		bottomPanel.add(submitButton);
 		submitButton.addActionListener(this);
 		
+		// For the entire panel
+		mainPanel.add(topPanel);
+		mainPanel.add(bottomPanel);
+		add(mainPanel);
 		// For diagnostic purposes
 //		windowSizeButton.addActionListener(this);
 //		windowSizeButton.setMnemonic(KeyEvent.VK_ENTER);
 //		bottomPanel.add(windowSizeButton);
 //		windowSizeButton.setVisible(false);
 		
-		Socket socket = null;
-		try {
-			socket = new Socket(serverAddress, 1234); // connect to server
-			oos = new ObjectOutputStream(socket.getOutputStream());
-			ois = new ObjectInputStream(socket.getInputStream());
-		}
-		catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Can't connect to server. Restart App.");
-			return;
-		}
-		
 		
 		/* Window Attributes */
-		clientWindow.setSize(300, 610);
-		clientWindow.setVisible(true);
+//		clientWindow.setSize(300, 610);
+//		clientWindow.setVisible(true);
 //		clientWindow.setResizable(false);
 //		clientWindow.setLocation(250, 250);
-		clientWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		clientWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String whereToConnect = JOptionPane.showInputDialog("Where to connect?", "localhost");
-			try {
-				new ITUserInputClient(whereToConnect);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			};
-				
+	public void start() {
+		try {
+			socket = new Socket(this.serverAddress, 1234); // connect to server - let server close the socket for us
+			oos = new ObjectOutputStream(socket.getOutputStream());
+			ois = new ObjectInputStream(socket.getInputStream());
+			this.compname =  InetAddress.getLocalHost().getCanonicalHostName();
+			oos.writeObject(new ActiveConnectionObj(clientid, compname, new Date(), "Client"));
+			new Thread(this).start();
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Can't connect to server. Restart App. " + e.toString());
+			return;
+		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		// TODO Auto-generated method stub
 		if (ae.getSource() == clearButton) {
 			// Popup and ask before making changes
-			int response = JOptionPane.showConfirmDialog(clientWindow, "Are you sure you want to clear the form?", 
+			int response = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to clear the form?", 
 					"Erase all form entries?", JOptionPane.YES_NO_OPTION);
 			if (response == JOptionPane.YES_OPTION) clearForm();
 			else {
-				JOptionPane.showMessageDialog(clientWindow, "Entries not Erased.", "Clear Form Cancelled"
+				JOptionPane.showMessageDialog(mainPanel, "Entries not Erased.", "Clear Form Cancelled"
 						, JOptionPane.PLAIN_MESSAGE);
 			}
 		}
 		if (ae.getSource() == submitButton) {
 			/* Ask before submitting processing */
-			int response = JOptionPane.showConfirmDialog(clientWindow, "Are you sure you want to submit the form?", 
+			int response = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to submit the form?", 
 					"Submit User", JOptionPane.YES_NO_OPTION);
 			
 			if (response == JOptionPane.YES_OPTION) processUser();
 			else {
-				JOptionPane.showMessageDialog(clientWindow, "User form not submitted.", "Submit Form Cancelled"
+				JOptionPane.showMessageDialog(mainPanel, "User form not submitted.", "Submit Form Cancelled"
 						, JOptionPane.PLAIN_MESSAGE);
 			}
 		}
@@ -209,26 +215,24 @@ public class ITUserInputClient implements ActionListener {
 //			System.out.println(dim);
 //		}
 		if (ae.getSource() == selectDate) {
-			empStartDatetxt.setText(new DatePicker(clientWindow).setPickedDate());
+			empStartDatetxt.setText(new DatePicker(null).setPickedDate());
 		}
 		if (ae.getSource() == EsubmitBtn){
 			final String user = emailField.getText();
-			char[] pass = passwordField.getPassword();
-	
+//			char[] pass = passwordField.getPassword();
+			emailFrame.dispose();
+			// TODO fix this to work with local smtp server
 			// Get authentication
 			try {
-				oos.writeObject(new RequestAuth(user, pass, this.filename));
-				emailFrame.dispose();
+				oos.writeObject(new RequestAuth(user));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(clientWindow, e.toString());
+				JOptionPane.showMessageDialog(null, e.toString());
 			}
 		}
 		
 		
 	}
 	private void processUser () {
-		
 		/* Get the input from the form */
 		String l_name = lastNametxt.getText().trim();
 		String f_name = firstNametxt.getText().trim();
@@ -244,7 +248,7 @@ public class ITUserInputClient implements ActionListener {
 		boolean emp_reg = regEmp.isSelected();
 		
 		if (f_name.length() == 0 || l_name.length() == 0 || emp_ID.length() == 0 || emp_title.length() == 0) {
-			JOptionPane.showMessageDialog(clientWindow, "First name, Last Name, Employee ID, and Title need to be filled in!");
+			JOptionPane.showMessageDialog(mainPanel, "First name, Last Name, Employee ID, and Title need to be filled in!");
 		}
 		else { 
 			try {
@@ -253,33 +257,22 @@ public class ITUserInputClient implements ActionListener {
 				/* Send it to the server in an Object and receive a payload to process */
 				oos.writeObject(u);
 				
-				// get form status
-				Object fs = ois.readObject();
-				
-				if (((FormStatus) fs).getStatusID() == 1) {
-					/* Get authentication request */
-					emailIt(u.getFileName());
-				}
 			} catch (Exception e) {
 				// Code the part where the server's down and you're sending the info it
 				JOptionPane.showMessageDialog(null, "Restart application or call IT.", "Connection to server lost.", JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
+				e.printStackTrace(); // TODO Take out for production
 			}
-			// Clear the form when we're done and expect a gui interface to send us a link to the pdf of the form
-			clearForm();
 		}	
 	}
 	
-	private void emailIt(String filename) {
+	private void emailIt() {
 		// call the email gui
 		emailFrame.getContentPane().add(emailPanel, "Center");
 		emailPanel.add(emailLabel);
 		emailPanel.add(emailField);
-		emailPanel.add(passwordLabel);
-		emailPanel.add(passwordField);
 		emailPanel.add(statusMsgs);
 		emailPanel.add(EsubmitBtn);
-		this.filename = filename;
+//		this.filename = filename;
 		EsubmitBtn.addActionListener(this);
 		emailFrame.setSize(300, 125);
 		emailFrame.setVisible(true);
@@ -300,4 +293,60 @@ public class ITUserInputClient implements ActionListener {
 		regEmp.setSelected(true);
 		empIsNotRehire.setSelected(true);
 	}
+
+	@Override
+	public void run() {receive();}
+	
+	// Multithreaded receive loop
+	private void receive() {
+		try {
+			while (true) {
+				Object serverResponse = ois.readObject();
+				// get form status
+				if (serverResponse instanceof FormStatus) {
+					FormStatus fs = (FormStatus) serverResponse;
+					int serverStatus = fs.getStatusID();
+					
+					if (serverStatus == UserStatusID.FORM_RECIEVED) { // form received code
+						emailIt();
+					}
+					else if (serverStatus == UserStatusID.EMAIL_SENT) { // email sent code
+						clearForm();
+						JOptionPane.showMessageDialog(null, "Form sent to Network Administrator.", "User Added!", JOptionPane.INFORMATION_MESSAGE);
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "Form not sent to server, try again.", "Error processing form.", JOptionPane.WARNING_MESSAGE);
+					}
+				}
+			}
+		}
+		catch (IOException ioe) {
+		} catch (ClassNotFoundException cnfe) {
+		}
+	}
+	
+	@Override 
+	public void windowClosing(WindowEvent arg0) {
+		try {
+			socket.close(); // break connection to server
+		} catch (Exception e) {/* Don't do anything */}
+	}
+	
+	@Override // Not Implemented
+	public void windowActivated(WindowEvent arg0) {}
+
+	@Override // Not Implemented
+	public void windowClosed(WindowEvent arg0) {}
+
+	@Override // Not Implemented
+	public void windowDeactivated(WindowEvent arg0) {}
+	
+	@Override // Not Implemented
+	public void windowDeiconified(WindowEvent arg0) {}
+	
+	@Override // Not Implemented
+	public void windowIconified(WindowEvent arg0) {}
+	
+	@Override // Not Implemented
+	public void windowOpened(WindowEvent arg0) {}
 }

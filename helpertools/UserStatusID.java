@@ -1,3 +1,4 @@
+package helpertools;
 
 public interface UserStatusID {
 	public static final int FORM_RECIEVED = 1; // The form was received by the server

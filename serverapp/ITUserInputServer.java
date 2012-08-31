@@ -7,6 +7,7 @@
  * Created on July 11, 2012
  */
 
+package serverapp;
 import java.io.*;
 //import java.util.Collection;
 //import java.util.TreeMap;
@@ -16,10 +17,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.swing.*;
+import helpertools.*;
 
 @SuppressWarnings("unused")
 public class ITUserInputServer  implements Runnable, ActionListener {
