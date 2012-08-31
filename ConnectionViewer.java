@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -39,7 +40,7 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 	private JList<String> propertiesList = new JList<String>(); // list of methods to invoke
 	private JLabel propertiesViewLabel = new JLabel("Active Connection Properties:");
 	private JScrollPane propertiesListPane = new JScrollPane(propertiesList);
-	private JButton killConnectionButton = new JButton();
+	private JButton killConnectionButton = new JButton("Disconnect User");
 	private String selectedUser = null; // method name from JList
 	
 	public ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> clients = 
@@ -81,15 +82,15 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 		dispWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void updateConnectionList(ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> connections) {
 		clients = connections; // update the list of clients
 		
 		// update active connection objects
 		Vector<String> dataL = new Vector<String>();
-		Enumeration<String> peopleLoggedIn = clients.keys();
+		Set<String> peopleLoggedIn = clients.keySet();
+		
 			try {
-				dataL.addAll((Collection<? extends String>) peopleLoggedIn);
+				dataL.addAll(peopleLoggedIn);
 			} catch (SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -121,6 +122,20 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 	public void actionPerformed(ActionEvent ae) {
 		// Handle the button presses
 		if (ae.getSource() == selectConnButton) {
+			HashMap<ActiveConnectionObj, ObjectOutputStream> userInQuestion = clients.get(selectedConnectionName);
+			Object[] clientACOArray = userInQuestion.keySet().toArray(); // get the ActiveConnectionObject
+//			Object clientOOS = userInQuestion.values();
+			ActiveConnectionObj clientACO = (ActiveConnectionObj) clientACOArray[0];
+			
+			Vector<String> propData = new Vector<String>();
+			
+			propData.add(clientACO.getUserName());
+			propData.add(clientACO.getConnectionStatus());
+			propData.add(clientACO.getCompName());
+			propData.add(clientACO.getLoginTime().toString());
+			
+			propertiesList.setListData(propData);
+			propertiesWindow.setVisible(true);
 			
 		}
 		if (ae.getSource() == killConnectionButton) {

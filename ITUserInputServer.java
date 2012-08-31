@@ -221,14 +221,15 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 			aco.appendToLog("Logged off server ");
 			// Serialize log here!
 			printToConsole("Someone's leaving.");
-			clients.remove(aco);
 			return; // gotta go!
 		}
 		catch (Exception e) { // What happened?
 			aco.appendToLog("Fatal error: " + e.getMessage());
-			clients.remove(aco);
 			printToConsole(e.getMessage());
-		} /* End receive loop */
+		} finally {
+			/* End receive loop */
+			clients.remove(aco.getUserName());
+		}
 	}// End run()
 	
 	private void printToConsole (String msg) {
