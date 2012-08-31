@@ -87,36 +87,25 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 		// update active connection objects
 		Vector<String> dataL = new Vector<String>();
 		
-		Enumeration <ActiveConnectionObj> people = clients.keys();
-		Method userMethod;
-		Object exeObj;
-		Class<?> classObject;
-		for (; people.hasMoreElements(); people.nextElement()) {
+		Collection<ActiveConnectionObj> people = clients.keySet();
+		Iterator<ActiveConnectionObj> persons = people.iterator();
+//		Method userMethod;
+//		Object exeObj;
+//		Class<?> classObject;
+		for (;persons.hasNext(); persons.next()) {
 			try {
-				classObject = people.getClass();
-				exeObj = classObject.newInstance();
-				userMethod = classObject.getMethod("getUserName");
-				String names = (String) userMethod.invoke(exeObj, new Object[0]); 
-				dataL.add(names);
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SecurityException e) {
+//				classObject = people.getClass();
+//				exeObj = classObject.newInstance();
+//				userMethod = classObject.getMethod("getUserName");
+//				String names = (String) userMethod.invoke(exeObj, new Object[0]); 
+				dataL.add(persons.toString());
+			}  catch (SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
 
 		}
 		connList.setListData(dataL);
