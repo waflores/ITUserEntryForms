@@ -42,10 +42,10 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 	private JButton killConnectionButton = new JButton();
 	private String selectedUser = null; // method name from JList
 	
-	public ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
-			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
+	public ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> clients = 
+			new ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>>();
 	
-	public ConnectionViewer(ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> connections) throws Exception {
+	public ConnectionViewer(ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> connections) throws Exception {
 		/* Main window attributes */
 		selectConnButton.addActionListener(this);
 		selectConnButton.setEnabled(false);
@@ -81,33 +81,23 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 		dispWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
-	public void updateConnectionList(ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> connections) {
+	@SuppressWarnings("unchecked")
+	public void updateConnectionList(ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> connections) {
 		clients = connections; // update the list of clients
 		
 		// update active connection objects
 		Vector<String> dataL = new Vector<String>();
-		
-		Collection<ActiveConnectionObj> people = clients.keySet();
-		Iterator<ActiveConnectionObj> persons = people.iterator();
-//		Method userMethod;
-//		Object exeObj;
-//		Class<?> classObject;
-		for (;persons.hasNext(); persons.next()) {
+		Enumeration<String> peopleLoggedIn = clients.keys();
 			try {
-//				classObject = people.getClass();
-//				exeObj = classObject.newInstance();
-//				userMethod = classObject.getMethod("getUserName");
-//				String names = (String) userMethod.invoke(exeObj, new Object[0]); 
-				dataL.add(persons.toString());
-			}  catch (SecurityException e) {
+				dataL.addAll((Collection<? extends String>) peopleLoggedIn);
+			} catch (SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} 
+			}
 
-		}
 		connList.setListData(dataL);
 	}
 	

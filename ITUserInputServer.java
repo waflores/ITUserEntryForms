@@ -27,8 +27,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	 * So always start with this collection EMPTY!
 	 * (So this collection need not be saved to disk.)
 	 */ 
-	private ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream> clients =
-			new ConcurrentHashMap<ActiveConnectionObj, ObjectOutputStream>();
+	private ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> clients =
+			new ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>>();
 	
 	private Vector<NewUser> addedUsers = new Vector<NewUser>();
 	
@@ -156,7 +156,11 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 			
 			if (msg instanceof ActiveConnectionObj) {
 				// Validate connection & save their connection information
-				clients.put(aco, oos);
+				String personLoggingOn = aco.getUserName();
+				HashMap<ActiveConnectionObj, ObjectOutputStream> HAO = new HashMap<ActiveConnectionObj, ObjectOutputStream>();
+				HAO.put(aco, oos);
+				
+				clients.put(personLoggingOn, HAO);
 				aco.appendToLog("Logged into server ");
 				printToConsole(aco.getUserName() + " is joining the server.");
 			}
