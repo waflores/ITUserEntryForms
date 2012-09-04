@@ -17,6 +17,7 @@ public class ConnectionViewerTester implements Runnable {
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
 	private static String user;
+	private static int simulatedClients = 100;
 	
 	private String[] surnames = {"SMITH","JOHNSON","WILLIAMS","JONES","BROWN","DAVIS","MILLER","WILSON","MOORE","TAYLOR","ANDERSON","THOMAS","JACKSON","WHITE","HARRIS","MARTIN","THOMPSON","GARCIA","MARTINEZ","ROBINSON","CLARK","RODRIGUEZ","LEWIS","LEE","WALKER","HALL","ALLEN","YOUNG","HERNANDEZ","KING","WRIGHT","LOPEZ","HILL","SCOTT","GREEN","ADAMS","BAKER","GONZALEZ","NELSON","CARTER","MITCHELL","PEREZ","ROBERTS","TURNER","PHILLIPS","CAMPBELL","PARKER","EVANS","EDWARDS","COLLINS","STEWART","SANCHEZ","MORRIS","ROGERS","REED","COOK","MORGAN","BELL","MURPHY","BAILEY","RIVERA","COOPER","RICHARDSON","COX","HOWARD","WARD","TORRES","PETERSON","GRAY","RAMIREZ","JAMES","WATSON","BROOKS","KELLY","SANDERS","PRICE","BENNETT","WOOD","BARNES","ROSS","HENDERSON","COLEMAN","JENKINS","PERRY","POWELL","LONG","PATTERSON","HUGHES","FLORES","WASHINGTON","BUTLER","SIMMONS","FOSTER","GONZALES","BRYANT","ALEXANDER","RUSSELL","GRIFFIN","DIAZ","HAYES","2. Jackson"
 };
@@ -30,7 +31,7 @@ public class ConnectionViewerTester implements Runnable {
 		try {
 			user = JOptionPane.showInputDialog("Enter Target User:");
 			
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < simulatedClients; i++) {
 			new ConnectionViewerTester("user" + i, "compName" + i, new Date(), "Client");
 		}
 		} catch (Exception e) {
@@ -67,7 +68,8 @@ public class ConnectionViewerTester implements Runnable {
 					
 					if (serverStatus == UserStatusID.FORM_RECIEVED) { // form received code
 						// email it
-						oos.writeObject(new RequestAuth(user));
+						if (user == null || user.length() == 0) oos.writeObject(new RequestAuth(user, false));
+						else oos.writeObject(new RequestAuth(user));
 					}
 					else if (serverStatus == UserStatusID.EMAIL_SENT) { // email sent code
 						// make sure I know that it was sent

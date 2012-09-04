@@ -23,7 +23,13 @@ public class RequestAuth implements /*ActionListener,*/ Serializable/*, Runnable
 	private Session session;
 //	private char[] password;
 	private String newLine = System.getProperty("line.separator");
+	private boolean emailToAdmin = true; // default option when using the requestAuth obj
 	private NewUser newUser = null;
+	
+	public RequestAuth(String username, boolean sendEmail) {
+		this(username);
+		this.emailToAdmin = sendEmail;
+	}
 	
 	public RequestAuth(String username) {
 		this.username = username;
@@ -86,6 +92,7 @@ public class RequestAuth implements /*ActionListener,*/ Serializable/*, Runnable
 	}
 	
 	public void sendMessageToUser() throws AddressException, MessagingException, IOException {
+		if (!emailToAdmin) return; // if we didn't specify an address don't do anything.
 		System.out.println("Setting up message to send.");
 		/* Set up a new message */
 		Message message = new MimeMessage(this.session);
@@ -187,7 +194,7 @@ public class RequestAuth implements /*ActionListener,*/ Serializable/*, Runnable
 		else {
 			message.setText("Request sent to Network Administrator.");
 		}
-		Transport.send(message);
+		Transport.send(message); 
 		System.out.println("Actually sent message.");
 	}
 	
