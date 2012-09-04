@@ -197,6 +197,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 					user = (NewUser) msg;
 					aco.appendToAddedUsers(user);
 					aco.appendToLog("Added a user ");
+					/* Add the user to the server's log */
+					addedUsers.add(user);
 					printToConsole(user.toString()); // trace
 					/* Form received */
 					oos.writeObject(new FormStatus(UserStatusID.FORM_RECIEVED));
@@ -252,6 +254,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 				new ConnectionViewer(clients);
 			}
 			if (ae.getSource() == adminDatabaseItem) {
+				new NewUserViewer(addedUsers);
 			}
 		}
 		catch (Exception e) {

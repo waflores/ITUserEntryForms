@@ -96,9 +96,9 @@ public class ConnectionViewerTester implements Runnable {
 	private void sendUser () throws ParseException, IOException {
 		/* Get the input from the form */
 		Random r = new Random();
-		char initial = (char)(r.nextInt(26) + 'a');
+		char initial = (char)(r.nextInt(26) + 'A');
 		 // Randomizer formula is start + random# * (end - start)
-		int startYear = 1980 + r.nextInt(22);
+		int startYear = 80 + r.nextInt(35);
 		int startMonth = 1 + r.nextInt(11);
 		int day = 1 + r.nextInt(27);
 		@SuppressWarnings("deprecation")
@@ -114,7 +114,7 @@ public class ConnectionViewerTester implements Runnable {
 		String emp_title = titles[(int)(Math.random() * titles.length)].trim();
 		String emp_manager = firstnames[(int)(Math.random() * firstnames.length)].trim() + " " + surnames[(int) (Math.random() * surnames.length)].trim() ;
 		String emp_dept = "Engineering";
-		String emp_ID = "" + ((int) Math.random());
+		String emp_ID = "" + r.nextInt(10000);
 		boolean emp_rehire = truths[(int)(Math.random() * truths.length)];
 		boolean emp_reg = truths[(int)(Math.random() * truths.length)];
 		
