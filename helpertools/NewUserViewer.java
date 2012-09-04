@@ -20,13 +20,14 @@ import javax.swing.event.ListSelectionListener;
 public class NewUserViewer implements ActionListener, ListSelectionListener, Runnable {
 	private String newLine = System.getProperty("line.separator");
 	private String atSign = "@"; // newLine only serves as a separator... not an actual newLine char
+	
 	/* Main display window */
 	private JFrame dispWindow = new JFrame("Connection Viewer"); // the viewing window :)
 	private JList<String> connList = new JList<String>(); // list of classes to display
 	private JLabel connViewLabel = new JLabel("Select a connection to view:");
 	private JScrollPane connListPane = new JScrollPane(connList);
 	private JButton selectConnButton = new JButton("Select Active User");
-	private String selectedConnectionName = null; // the selected classname from the JList
+	private int selectedUsernName = -1; // the selected classname from the JList
 	
 	/* Method display window */
 	private JFrame propertiesWindow = new JFrame(); 
@@ -83,7 +84,7 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 		Vector<String> userData = new Vector<String>();
 		
 		for (NewUser user : users) {
-			String dataList = user.toString().replaceAll(atSign, newLine); // separate the data
+			String dataList = user.getF_name() + " " + user.getM_initials() + " " + user.getL_name(); // separate the data
 			userData.add(dataList);
 		}
 		connList.setListData(userData);
@@ -98,7 +99,7 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 		if(lse.getValueIsAdjusting()) return; //de-bounce the JList Selection
 		/* Handle selections */
 		else if (lse.getSource() == connList) {
-			selectedConnectionName = connList.getSelectedValue();
+			selectedUsernName = connList.getSelectedIndex();
 		}
 		else if (lse.getSource() == propertiesList) {
 			selectedUser = propertiesList.getSelectedValue();
@@ -109,7 +110,7 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 	public void actionPerformed(ActionEvent ae) {
 		// Handle the button presses
 		if (ae.getSource() == selectConnButton) {
-			
+			JOptionPane.showMessageDialog(dispWindow, users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
 		}
 		if (ae.getSource() == killConnectionButton) {
 			try {
