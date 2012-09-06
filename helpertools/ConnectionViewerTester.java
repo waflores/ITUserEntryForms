@@ -17,7 +17,7 @@ public class ConnectionViewerTester implements Runnable {
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
 	private static String user;
-	private static int simulatedClients = 5;
+	private static int simulatedClients = 50;
 	
 	private String[] surnames = {"SMITH","JOHNSON","WILLIAMS","JONES","BROWN","DAVIS","MILLER","WILSON","MOORE","TAYLOR","ANDERSON","THOMAS","JACKSON","WHITE","HARRIS","MARTIN","THOMPSON","GARCIA","MARTINEZ","ROBINSON","CLARK","RODRIGUEZ","LEWIS","LEE","WALKER","HALL","ALLEN","YOUNG","HERNANDEZ","KING","WRIGHT","LOPEZ","HILL","SCOTT","GREEN","ADAMS","BAKER","GONZALEZ","NELSON","CARTER","MITCHELL","PEREZ","ROBERTS","TURNER","PHILLIPS","CAMPBELL","PARKER","EVANS","EDWARDS","COLLINS","STEWART","SANCHEZ","MORRIS","ROGERS","REED","COOK","MORGAN","BELL","MURPHY","BAILEY","RIVERA","COOPER","RICHARDSON","COX","HOWARD","WARD","TORRES","PETERSON","GRAY","RAMIREZ","JAMES","WATSON","BROOKS","KELLY","SANDERS","PRICE","BENNETT","WOOD","BARNES","ROSS","HENDERSON","COLEMAN","JENKINS","PERRY","POWELL","LONG","PATTERSON","HUGHES","FLORES","WASHINGTON","BUTLER","SIMMONS","FOSTER","GONZALES","BRYANT","ALEXANDER","RUSSELL","GRIFFIN","DIAZ","HAYES","2. Jackson"
 };
@@ -74,7 +74,8 @@ public class ConnectionViewerTester implements Runnable {
 					else if (serverStatus == UserStatusID.EMAIL_SENT) { // email sent code
 						// make sure I know that it was sent
 						System.out.println("Message was sent out!");
-						break; // you're done!
+						if (truths[(int)(Math.random() * truths.length)]) stayLoggedOn();
+						else break; // you're done!
 					}
 					else {
 						// error msg for no email sent...
@@ -94,6 +95,11 @@ public class ConnectionViewerTester implements Runnable {
 		} 
 	}
 	
+	private void stayLoggedOn() {
+		// TODO Auto-generated method stub
+		while(true) {} // stay tied up in the system
+	}
+
 	/* Modular test units */
 	private void sendUser () throws ParseException, IOException {
 		/* Get the input from the form */

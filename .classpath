@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="ITUserSimpleInputClient.java|Picker.java|msgsend.java|SendMailTLS.java|TestEmail.java" kind="src" path=""/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaMail"/>
+	<classpathentry excluding="ITUserSimpleInputClient.java|Picker.java|msgsend.java|SendMailTLS.java|TestEmail.java|clientapp/ITUserInputClient.java|misctools/" kind="src" path=""/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/glassfish3/glassfish/modules/javax.mail.jar"/>
 	<classpathentry kind="output" path=""/>

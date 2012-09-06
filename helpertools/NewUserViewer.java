@@ -3,18 +3,13 @@ package helpertools;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
-import java.util.Set;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
@@ -38,7 +33,6 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 	private JLabel propertiesViewLabel = new JLabel("Active Connection Properties:");
 	private JScrollPane propertiesListPane = new JScrollPane(propertiesList);
 	private JButton killConnectionButton = new JButton("Disconnect User");
-	private String selectedUser = null; // method name from JList
 	private ObjectOutputStream ACOoos = null;
 	
 	/* New User Form Generator  */
@@ -49,7 +43,6 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 	private JButton exitFormGen = new JButton("Close");
 	private JTextArea userDataView = new JTextArea();
 	private JScrollPane outScrollPane = new JScrollPane(userDataView);
-	private JScrollBar vsb = outScrollPane.getVerticalScrollBar();
 	private JPanel formBtnPanel = new JPanel();
 	
 	public Vector<NewUser> users = 
@@ -132,7 +125,7 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 			selectedUsernName = connList.getSelectedIndex();
 		}
 		else if (lse.getSource() == propertiesList) {
-			selectedUser = propertiesList.getSelectedValue();
+			propertiesList.getSelectedValue();
 		}
 	}
 
@@ -153,7 +146,7 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 		}
 		if (ae.getSource() == formGen) {
 			// Generate the form and use the JFileChooser
-			JOptionPane.showMessageDialog(formGenWindow, "Generate a form!");
+			generateForm(null);
 		}
 		if (ae.getSource() == nextFormGen) {
 			// Show the next person in the list
@@ -183,8 +176,9 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 	}
 
 	private void generateForm(NewUser newUser) {
-		
+		JOptionPane.showMessageDialog(formGenWindow, "Generate a form!");
 	}
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub

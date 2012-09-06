@@ -69,7 +69,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 //	private JButton windowSizeButton = new JButton("WindowSize");
 	
 	/* Our Data */
-	private String clientid = System.getProperty("user.name"); // Get the person's user name
+	private String clientid = "client1"; //System.getProperty("user.name"); // Get the person's user name
 	private String compname; // log computer name
 	
 	/* Network Streams */
