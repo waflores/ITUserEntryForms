@@ -218,12 +218,11 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 			empStartDatetxt.setText(new DatePicker(null).setPickedDate());
 		}
 		if (ae.getSource() == EsubmitBtn){
-			final String user = emailField.getText();
-//			char[] pass = passwordField.getPassword();
-			emailFrame.dispose();
-			// TODO fix this to work with local smtp server
 			// Get authentication
-			try {
+			try {			
+				final String user = emailField.getText();
+//				char[] pass = passwordField.getPassword();
+				emailFrame.dispose();
 				oos.writeObject(new RequestAuth(user));
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null, e.toString());
