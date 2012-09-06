@@ -13,7 +13,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -37,6 +40,17 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 	private JButton killConnectionButton = new JButton("Disconnect User");
 	private String selectedUser = null; // method name from JList
 	private ObjectOutputStream ACOoos = null;
+	
+	/* New User Form Generator  */
+	private JFrame formGenWindow = new JFrame("Form Generator");
+	private JButton formGen = new JButton("Generate Form");
+	private JButton prevFormGen = new JButton("Prev User");
+	private JButton nextFormGen = new JButton("Next User");
+	private JButton exitFormGen = new JButton("Close");
+	private JTextArea userDataView = new JTextArea();
+	private JScrollPane outScrollPane = new JScrollPane(userDataView);
+	private JScrollBar vsb = outScrollPane.getVerticalScrollBar();
+	private JPanel formBtnPanel = new JPanel();
 	
 	public Vector<NewUser> users = 
 			new Vector<NewUser>();
@@ -71,6 +85,22 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 		propertiesWindow.getContentPane().add(propertiesListPane, "Center");
 		propertiesWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		propertiesWindow.setVisible(false);
+		
+		/* Form generator window*/
+		formGenWindow.add(outScrollPane, "Center");
+		formGenWindow.add(formBtnPanel, "South");
+		formBtnPanel.add(prevFormGen);
+		formBtnPanel.add(nextFormGen);
+		formBtnPanel.add(formGen);
+		formBtnPanel.add(exitFormGen);
+		prevFormGen.addActionListener(this);
+		nextFormGen.addActionListener(this);
+		formGen.addActionListener(this);
+		exitFormGen.addActionListener(this);
+		userDataView.setEditable(false);
+		formGenWindow.setSize(450, 450);
+		formGenWindow.setVisible(false);
+		formGenWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		/* Don't Exit the program when the GUI is closed */
 		dispWindow.setVisible(true);
@@ -110,7 +140,9 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 	public void actionPerformed(ActionEvent ae) {
 		// Handle the button presses
 		if (ae.getSource() == selectConnButton) {
-			JOptionPane.showMessageDialog(dispWindow, users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
+			//JOptionPane.showMessageDialog(dispWindow, users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
+			userDataView.setText(users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
+			formGenWindow.setVisible(true);
 		}
 		if (ae.getSource() == killConnectionButton) {
 			try {
@@ -119,8 +151,40 @@ public class NewUserViewer implements ActionListener, ListSelectionListener, Run
 				JOptionPane.showMessageDialog(propertiesWindow, e.getMessage());
 			}
 		}
+		if (ae.getSource() == formGen) {
+			// Generate the form and use the JFileChooser
+			JOptionPane.showMessageDialog(formGenWindow, "Generate a form!");
+		}
+		if (ae.getSource() == nextFormGen) {
+			// Show the next person in the list
+			try {
+				selectedUsernName += 1;
+				userDataView.setText(users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
+			}
+			catch (ArrayIndexOutOfBoundsException aioobe) {
+				selectedUsernName = 0; // get back the to the start of the list
+				userDataView.setText(users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
+			}
+		}
+		if (ae.getSource() == prevFormGen) {
+			try {
+				selectedUsernName -= 1;
+				userDataView.setText(users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
+			}
+			catch (ArrayIndexOutOfBoundsException aioobe) {
+				selectedUsernName = users.size() - 1;
+				userDataView.setText(users.elementAt(selectedUsernName).toString().replaceAll(atSign, newLine));
+			}
+		}
+		if (ae.getSource() == exitFormGen) {
+			// close this form generating gui
+			formGenWindow.dispose();
+		}
 	}
 
+	private void generateForm(NewUser newUser) {
+		
+	}
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
