@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.Date;
 import javax.mail.Session;
 import javax.swing.*;
+
 import helpertools.*; // custom import 
 
 // how to sign apps
@@ -317,10 +318,16 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 						JOptionPane.showMessageDialog(null, "Form not sent to server, try again.", "Error processing form.", JOptionPane.WARNING_MESSAGE);
 					}
 				}
+				if (serverResponse instanceof String) {
+					JOptionPane.showMessageDialog(null, (String) serverResponse, "Error processing form.", JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 		}
 		catch (IOException ioe) {
+			JOptionPane.showMessageDialog(null, ioe.getLocalizedMessage(), "Error with IO",  JOptionPane.WARNING_MESSAGE);
+			ioe.printStackTrace();
 		} catch (ClassNotFoundException cnfe) {
+			JOptionPane.showMessageDialog(null, cnfe.getMessage() + cnfe.getCause().toString(), "Error with Classes",  JOptionPane.WARNING_MESSAGE);
 		}
 	}
 	

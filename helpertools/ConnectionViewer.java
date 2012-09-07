@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -42,8 +43,10 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 	private JLabel propertiesViewLabel = new JLabel("Active Connection Properties:");
 	private JScrollPane propertiesListPane = new JScrollPane(propertiesList);
 	private JButton killConnectionButton = new JButton("Disconnect User");
+	private JButton sendConnectionButton = new JButton("Send Object");
 	private String selectedUser = null; // method name from JList
 	private ObjectOutputStream ACOoos = null;
+	private JPanel propbtnpanel = new JPanel();
 	
 	public ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> clients = 
 			new ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>>();
@@ -68,13 +71,17 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 		/* Main window attributes */
 		killConnectionButton.addActionListener(this);
 		killConnectionButton.setEnabled(false);
+		sendConnectionButton.addActionListener(this);
+		sendConnectionButton.setEnabled(false);
 		propertiesList.addListSelectionListener(this);
 		propertiesList.setSelectionMode(0); // Single selection of methods to invoke
 		
 		/* Method Display Window */
 		propertiesWindow.setSize(300, 200);
 		propertiesWindow.getContentPane().add(propertiesViewLabel, "North");
-		propertiesWindow.getContentPane().add(killConnectionButton, "South");
+		propbtnpanel.add(killConnectionButton);
+		propbtnpanel.add(sendConnectionButton);
+		propertiesWindow.getContentPane().add(propbtnpanel, "South");
 		propertiesWindow.getContentPane().add(propertiesListPane, "Center");
 		propertiesWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		propertiesWindow.setVisible(false);
@@ -109,6 +116,7 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 		// Re-enable the buttons that were disabled
 		selectConnButton.setEnabled(true);
 		killConnectionButton.setEnabled(true);
+		sendConnectionButton.setEnabled(true);
 		
 		if(lse.getValueIsAdjusting()) return; //de-bounce the JList Selection
 		/* Handle selections */
@@ -146,6 +154,15 @@ public class ConnectionViewer implements ActionListener, ListSelectionListener, 
 			try {
 				ACOoos.close();
 			} catch (Exception e) {
+				JOptionPane.showMessageDialog(propertiesWindow, e.getMessage());
+			}
+		}
+		if (ae.getSource() == sendConnectionButton) {
+			// new ObjectDiagnostic Object
+			try {
+				String msg = JOptionPane.showInputDialog("Send a message to the user.");
+				ACOoos.writeUTF(msg.trim());
+			} catch (IOException e) {
 				JOptionPane.showMessageDialog(propertiesWindow, e.getMessage());
 			}
 		}

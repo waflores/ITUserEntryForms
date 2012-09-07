@@ -68,7 +68,7 @@ public class ConnectionViewerTester implements Runnable {
 					
 					if (serverStatus == UserStatusID.FORM_RECIEVED) { // form received code
 						// email it
-						if (user == null || user.length() == 0) oos.writeObject(new RequestAuth(user, true));
+						if (user == null || user.length() == 0) oos.writeObject(new RequestAuth(user, false));
 						else oos.writeObject(new RequestAuth(user));
 					}
 					else if (serverStatus == UserStatusID.EMAIL_SENT) { // email sent code
