@@ -303,6 +303,9 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 			while (true) {
 				Object serverResponse = ois.readObject();
 				// get form status
+				if (serverResponse instanceof String) {
+					JOptionPane.showMessageDialog(null, (String) serverResponse, "Error processing form.", JOptionPane.INFORMATION_MESSAGE);
+				}
 				if (serverResponse instanceof FormStatus) {
 					FormStatus fs = (FormStatus) serverResponse;
 					int serverStatus = fs.getStatusID();
@@ -317,9 +320,6 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 					else {
 						JOptionPane.showMessageDialog(null, "Form not sent to server, try again.", "Error processing form.", JOptionPane.WARNING_MESSAGE);
 					}
-				}
-				if (serverResponse instanceof String) {
-					JOptionPane.showMessageDialog(null, (String) serverResponse, "Error processing form.", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		}
