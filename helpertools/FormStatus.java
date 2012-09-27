@@ -30,6 +30,8 @@ public class FormStatus implements Serializable, UserStatusID {
 			break;
 		case UserStatusID.FATAL_ERROR:
 			break;
+		case UserStatusID.FORM_STORED:
+			break;
 		default:
 			break;
 		}

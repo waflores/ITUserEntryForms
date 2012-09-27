@@ -313,7 +313,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 					if (serverStatus == UserStatusID.FORM_RECIEVED) { // form received code
 						emailIt();
 					}
-					else if (serverStatus == UserStatusID.EMAIL_SENT) { // email sent code
+					else if (serverStatus == UserStatusID.FORM_STORED) { // Form Stored code
 						clearForm();
 						JOptionPane.showMessageDialog(null, "Form sent to Network Administrator.", "User Added!", JOptionPane.INFORMATION_MESSAGE);
 					}

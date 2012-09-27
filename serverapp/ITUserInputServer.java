@@ -31,6 +31,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	private ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>> clients =
 			new ConcurrentHashMap<String, HashMap<ActiveConnectionObj, ObjectOutputStream>>();
 	
+	private Vector<RequestAuth> tobeMailed = new Vector<RequestAuth>();
 	private Vector<NewUser> addedUsers = new Vector<NewUser>();
 	
 	private int portNumber = 1234;
@@ -206,16 +207,17 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 				}
 				if (userInputed && msg instanceof RequestAuth) {
 					RequestAuth ra = (RequestAuth) msg;
-					// Sent the request to the admin
-					printToConsole("Sending message to admin.");
-					ra.Authenticate();
-					ra.addUser(user);
-					ra.sendMessageToUser();
-					/* Sent the email */
-					oos.writeObject(new FormStatus(UserStatusID.EMAIL_SENT));
-					userInputed = false; // reset for next user to inputed
-					user = null; // reset for next user to be input
+					// Store the message and acknowledge that the user client inputed data
+					synchronized (this) { // Try synch for multi-threading
+						printToConsole("Adding a new Request Authorization to the List of People to be emailed.");
+						ra.addUser(user); // couple user object to the requestAuth object
+						tobeMailed.add(ra);
+						userInputed = false; // reset for next user to inputed
+						user = null; // reset for next user to be input
+						oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
+					}
 				}
+				if (!tobeMailed.isEmpty()) checkObjectsToBeSent(); // check if only when there's something to check
 				
 			} // End While
 		}
@@ -235,6 +237,28 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		}
 	}// End run()
 	
+	// Check and send each RA object - the kludgy way.
+	private synchronized void checkObjectsToBeSent() {
+		int usersTosend = this.tobeMailed.size();
+		
+		if (usersTosend == 0) return; // early return if it's empty
+		else {
+			try {
+				for (int index = 0; index != usersTosend; index++) {
+					tobeMailed.elementAt(index).Authenticate();
+					tobeMailed.elementAt(index).sendMessageToUser();
+					tobeMailed.remove(index);
+				}
+			}
+			catch(IOException ioe) {
+				
+			}
+			catch (Exception e) {
+				
+			}
+		}
+	}
+
 	private void printToConsole (String msg) {
 		outTextArea.append(msg + newLine);
 		vsb.setValue(vsb.getMaximum());
