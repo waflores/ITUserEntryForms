@@ -26,6 +26,8 @@ public class NewUser implements Serializable {
 	private String atSign = "@"; // newLine only serves as a separator... not an actual newLine char
 	private String fileName;
 	
+	private boolean sentToServer = false;
+	
 	/* The constructor for our object */
 //	@SuppressWarnings("deprecation")
 	public NewUser(String f_name, String l_name, String pref_name, String m_initials, String title, 
@@ -220,6 +222,14 @@ public class NewUser implements Serializable {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public boolean isSentToServer() {
+		return sentToServer;
+	}
+
+	public void setSentToServer(boolean sentToServer) {
+		this.sentToServer = sentToServer;
 	}
 	
 }

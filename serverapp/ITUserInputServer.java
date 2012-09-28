@@ -37,6 +37,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	private int portNumber = 1234;
 	private ServerSocket ss;
 	
+	private final Object synchLock = new Object();
+	
 	/* Server GUI Stuff */
 	private JFrame serverWindow = new JFrame("IT New User Input Server");
 	private JPanel mainPanel = new JPanel();
@@ -98,7 +100,8 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		
 		serverWindow.getContentPane().add(mainPanel, "Center");
 		serverWindow.getContentPane().add(btnPanel, "South");
-		mainPanel.add(txtPanel);
+		mainPanel.add(outScrollPane); // to get a full bottom experience
+		//mainPanel.add(txtPanel); // original design
 
 		/* Create menu bar */
 		createMonitorMenu();
@@ -108,7 +111,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 		serverWindow.setJMenuBar(menuBar);
 		
 		/* Add server Log window */
-		txtPanel.add(outScrollPane);
+		//txtPanel.add(outScrollPane); // original design
 		outTextArea.setEditable(false); // Just make this a display text area
 
 		btnPanel.add(closeButton);
@@ -208,7 +211,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 				if (userInputed && msg instanceof RequestAuth) {
 					RequestAuth ra = (RequestAuth) msg;
 					// Store the message and acknowledge that the user client inputed data
-					synchronized (this) { // Try synch for multi-threading
+					synchronized (synchLock) { // Try synch for multi-threading
 						printToConsole("Adding a new Request Authorization to the List of People to be emailed.");
 						ra.addUser(user); // couple user object to the requestAuth object
 						tobeMailed.add(ra);
