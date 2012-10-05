@@ -19,7 +19,7 @@ import helpertools.*; // custom import
 @SuppressWarnings({ "unused", "serial" })
 public class ITUserInputClientApp extends JApplet implements ActionListener, Runnable, WindowListener {
 	// Form GUI
-//	private JFrame clientWindow = new JFrame("New User Input Client");
+	private JFrame clientWindow = new JFrame("New User Input Client");
 	private JPanel mainPanel = new JPanel();
 	private JPanel topPanel = new JPanel();
 	private JPanel bottomPanel = new JPanel();
@@ -157,7 +157,8 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 		// For the entire panel
 		mainPanel.add(topPanel);
 		mainPanel.add(bottomPanel);
-		add(mainPanel);
+		clientWindow.add(mainPanel);
+		
 		// For diagnostic purposes
 //		windowSizeButton.addActionListener(this);
 //		windowSizeButton.setMnemonic(KeyEvent.VK_ENTER);
@@ -166,11 +167,11 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 		
 		
 		/* Window Attributes */
-//		clientWindow.setSize(300, 610);
-//		clientWindow.setVisible(true);
-//		clientWindow.setResizable(false);
-//		clientWindow.setLocation(250, 250);
-//		clientWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		clientWindow.setSize(300, 610);
+		clientWindow.setVisible(true);
+		clientWindow.setResizable(false);
+		clientWindow.setLocation(250, 250);
+		clientWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
 	public void start() {
@@ -216,7 +217,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 //			System.out.println(dim);
 //		}
 		if (ae.getSource() == selectDate) {
-			empStartDatetxt.setText(new DatePicker(null).setPickedDate());
+			empStartDatetxt.setText(new DatePicker(clientWindow).setPickedDate());
 		}
 		if (ae.getSource() == EsubmitBtn){
 			// Get authentication
@@ -275,6 +276,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 //		this.filename = filename;
 		EsubmitBtn.addActionListener(this);
 		emailFrame.setSize(300, 125);
+		emailFrame.setLocationRelativeTo(clientWindow);
 		emailFrame.setVisible(true);
 		emailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
