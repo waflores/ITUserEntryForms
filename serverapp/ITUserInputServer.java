@@ -37,7 +37,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	private int portNumber = 1234;
 	private ServerSocket ss;
 	
-	private final Object synchLock = new Object();
+	//private final Object synchLock = new Object();
 	
 	/* Server GUI Stuff */
 	private JFrame serverWindow = new JFrame("IT New User Input Server");
@@ -210,17 +210,26 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 				}
 				if (userInputed && msg instanceof RequestAuth) {
 					RequestAuth ra = (RequestAuth) msg;
+					// Set the request to the admin
+					printToConsole("Sending message to admin.");
+					ra.Authenticate();
+					ra.addUser(user);
+					ra.sendMessageToUser();
+					/* Sent the email */
+					oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
+					userInputed = false; // reset for next user to inputed
+					user = null; // reset for next user to be input
 					// Store the message and acknowledge that the user client inputed data
-					synchronized (synchLock) { // Try synch for multi-threading
-						printToConsole("Adding a new Request Authorization to the List of People to be emailed.");
-						ra.addUser(user); // couple user object to the requestAuth object
-						tobeMailed.add(ra);
-						userInputed = false; // reset for next user to inputed
-						user = null; // reset for next user to be input
-						oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
-					}
+//					synchronized (synchLock) { // Try synch for multi-threading
+//						printToConsole("Adding a new Request Authorization to the List of People to be emailed.");
+//						ra.addUser(user); // couple user object to the requestAuth object
+//						tobeMailed.add(ra);
+//						userInputed = false; // reset for next user to inputed
+//						user = null; // reset for next user to be input
+//						oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
+//					}
 				}
-				if (!tobeMailed.isEmpty()) checkObjectsToBeSent(); // check if only when there's something to check
+				//if (!tobeMailed.isEmpty()) checkObjectsToBeSent(); // check if only when there's something to check
 				
 			} // End While
 		}
@@ -241,26 +250,26 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 	}// End run()
 	
 	// Check and send each RA object - the kludgy way.
-	private synchronized void checkObjectsToBeSent() {
-		int usersTosend = this.tobeMailed.size();
-		
-		if (usersTosend == 0) return; // early return if it's empty
-		else {
-			try {
-				for (int index = 0; index != usersTosend; index++) {
-					tobeMailed.elementAt(index).Authenticate();
-					tobeMailed.elementAt(index).sendMessageToUser();
-					tobeMailed.remove(index);
-				}
-			}
-			catch(IOException ioe) {
-				
-			}
-			catch (Exception e) {
-				
-			}
-		}
-	}
+//	private synchronized void checkObjectsToBeSent() {
+//		int usersTosend = this.tobeMailed.size();
+//		
+//		if (usersTosend == 0) return; // early return if it's empty
+//		else {
+//			try {
+//				for (int index = 0; index != usersTosend; index++) {
+//					tobeMailed.elementAt(index).Authenticate();
+//					tobeMailed.elementAt(index).sendMessageToUser();
+//					tobeMailed.remove(index);
+//				}
+//			}
+//			catch(IOException ioe) {
+//				
+//			}
+//			catch (Exception e) {
+//				
+//			}
+//		}
+//	}
 
 	private void printToConsole (String msg) {
 		outTextArea.append(msg + newLine);
