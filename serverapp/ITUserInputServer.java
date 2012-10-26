@@ -205,30 +205,40 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 					addedUsers.add(user);
 					printToConsole(user.toString()); // trace
 					/* Form received */
-					oos.writeObject(new FormStatus(UserStatusID.FORM_RECIEVED));
-					userInputed = true;
-				}
-				if (userInputed && msg instanceof RequestAuth) {
-					RequestAuth ra = (RequestAuth) msg;
-					// Set the request to the admin
+					final String emailUser = "william.flores.contractor@fujifilmdb.com"; 
+					RequestAuth ra = new RequestAuth(emailUser);
 					printToConsole("Sending message to admin.");
 					ra.Authenticate();
 					ra.addUser(user);
 					ra.sendMessageToUser();
 					/* Sent the email */
 					//oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
-					userInputed = false; // reset for next user to inputed
+					//userInputed = false; // reset for next user to inputed
 					user = null; // reset for next user to be input
-					// Store the message and acknowledge that the user client inputed data
-//					synchronized (synchLock) { // Try synch for multi-threading
-//						printToConsole("Adding a new Request Authorization to the List of People to be emailed.");
-//						ra.addUser(user); // couple user object to the requestAuth object
-//						tobeMailed.add(ra);
-//						userInputed = false; // reset for next user to inputed
-//						user = null; // reset for next user to be input
-//						oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
-//					}
+					//oos.writeObject(new FormStatus(UserStatusID.FORM_RECIEVED));
+					//userInputed = true;
 				}
+//				if (userInputed && msg instanceof RequestAuth) {
+//					RequestAuth ra = (RequestAuth) msg;
+//					// Set the request to the admin
+//					printToConsole("Sending message to admin.");
+//					ra.Authenticate();
+//					ra.addUser(user);
+//					ra.sendMessageToUser();
+//					/* Sent the email */
+//					//oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
+//					userInputed = false; // reset for next user to inputed
+//					user = null; // reset for next user to be input
+//					// Store the message and acknowledge that the user client inputed data
+////					synchronized (synchLock) { // Try synch for multi-threading
+////						printToConsole("Adding a new Request Authorization to the List of People to be emailed.");
+////						ra.addUser(user); // couple user object to the requestAuth object
+////						tobeMailed.add(ra);
+////						userInputed = false; // reset for next user to inputed
+////						user = null; // reset for next user to be input
+////						oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
+////					}
+//				}
 				//if (!tobeMailed.isEmpty()) checkObjectsToBeSent(); // check if only when there's something to check
 				
 			} // End While

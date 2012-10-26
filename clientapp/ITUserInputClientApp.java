@@ -258,7 +258,9 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 				NewUser u = new NewUser(f_name, l_name, p_name, m_name, emp_title, emp_manager, emp_dept, emp_ID, emp_loc, emp_start, emp_rehire, emp_reg);
 				/* Send it to the server in an Object and receive a payload to process */
 				oos.writeObject(u);
-				
+				// Sent the new user
+				clearForm();
+				JOptionPane.showMessageDialog(null, "Form sent to Network Administrator.", "User Added!", JOptionPane.INFORMATION_MESSAGE);
 			} catch (Exception e) {
 				// Code the part where the server's down and you're sending the info it
 				JOptionPane.showMessageDialog(null, "Restart application or call IT.", "Connection to server lost.", JOptionPane.ERROR_MESSAGE);
