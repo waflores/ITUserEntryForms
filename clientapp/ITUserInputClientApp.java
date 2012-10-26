@@ -307,19 +307,25 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 				Object serverResponse = ois.readObject();
 				// get form status
 				if (serverResponse instanceof String) {
-					JOptionPane.showMessageDialog(null, (String) serverResponse, "Error processing form.", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, (String) serverResponse, "Error from Server processing form.", JOptionPane.INFORMATION_MESSAGE);
 				}
 				if (serverResponse instanceof FormStatus) {
 					FormStatus fs = (FormStatus) serverResponse;
 					int serverStatus = fs.getStatusID();
+					/* Going to circumenvent the back and forth from the server to the client */
+					/* Most likely the object was sent, else some Exception */
 					
 					if (serverStatus == UserStatusID.FORM_RECIEVED) { // form received code
-						emailIt();
-					}
-					else if (serverStatus == UserStatusID.FORM_STORED) { // Form Stored code
+						//emailIt();
 						clearForm();
+						final String user = "william.flores.contractor@fujifilmdb.com"; 
+						oos.writeObject(new RequestAuth(user));
 						JOptionPane.showMessageDialog(null, "Form sent to Network Administrator.", "User Added!", JOptionPane.INFORMATION_MESSAGE);
 					}
+//					else if (serverStatus == UserStatusID.FORM_STORED) { // Form Stored code
+//						clearForm();
+//						JOptionPane.showMessageDialog(null, "Form sent to Network Administrator.", "User Added!", JOptionPane.INFORMATION_MESSAGE);
+//					}
 					else {
 						JOptionPane.showMessageDialog(null, "Form not sent to server, try again.", "Error processing form.", JOptionPane.WARNING_MESSAGE);
 					}
@@ -327,7 +333,7 @@ public class ITUserInputClientApp extends JApplet implements ActionListener, Run
 			}
 		}
 		catch (IOException ioe) {
-			JOptionPane.showMessageDialog(null, ioe.getLocalizedMessage(), "Error with IO",  JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, ioe.getLocalizedMessage(), "Communication with server lost.",  JOptionPane.WARNING_MESSAGE);
 			ioe.printStackTrace();
 		} catch (ClassNotFoundException cnfe) {
 			JOptionPane.showMessageDialog(null, cnfe.getMessage() + cnfe.getCause().toString(), "Error with Classes",  JOptionPane.WARNING_MESSAGE);

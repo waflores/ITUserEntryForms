@@ -216,7 +216,7 @@ public class ITUserInputServer  implements Runnable, ActionListener {
 					ra.addUser(user);
 					ra.sendMessageToUser();
 					/* Sent the email */
-					oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
+					//oos.writeObject(new FormStatus(UserStatusID.FORM_STORED));
 					userInputed = false; // reset for next user to inputed
 					user = null; // reset for next user to be input
 					// Store the message and acknowledge that the user client inputed data
