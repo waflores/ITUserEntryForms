@@ -2,6 +2,7 @@ package clientapp;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+
 import javax.swing.*;
 import helpertools.*;
 
@@ -86,8 +87,8 @@ public class ITUserInputProgram implements ActionListener {
 		mainPanel.add(empLoc); // a dropdown menu
 		mainPanel.add(empDept);
 		mainPanel.add(empDepttxt);
-		mainPanel.add(empStartDate);
-		mainPanel.add(empStartDatetxt);
+//		mainPanel.add(empStartDate);
+//		mainPanel.add(empStartDatetxt);
 		empStartDatetxt.setEditable(false); // Just display whatever the user chooses as a date
 //		mainPanel.add(selectDate); // Instantiate datePicker
 //		selectDate.addActionListener(this);
@@ -95,7 +96,7 @@ public class ITUserInputProgram implements ActionListener {
 //		rightPanel.add(Box.createHorizontalStrut(15)); // create some space in the GUI
 		mainPanel.add(Box.createHorizontalStrut(5));
 		
-		mainPanel.add(empRehire);
+//		mainPanel.add(empRehire);
 //		mainPanel.add(empIsNotRehire);
 //		mainPanel.add(empIsRehire);	
 		mainPanel.add(Box.createHorizontalStrut(15)); // create some space in the GUI
@@ -210,26 +211,16 @@ public class ITUserInputProgram implements ActionListener {
 			JOptionPane.showMessageDialog(clientWindow, "First name, Last Name, Employee ID, and Title need to be filled in!");
 		}
 		else { 
+			Process p;
 			
-//			try {
-//				/* Create user object */
-//				NewUser u = new NewUser(f_name, l_name, p_name, m_name, emp_title, emp_manager, emp_dept, emp_ID, emp_loc, emp_start, emp_rehire, emp_reg);
-//				/* Send it to the server in an Object and receive a payload to process */
-//				oos.writeObject(u);
-//				
-//				// get form status
-//				Object fs = ois.readObject();
-//				
-//				if (((FormStatus) fs).getStatusID() == 1) {
-//					/* Get authentication request */
-//					emailIt(u.getFileName());
-//				}
-//			} catch (Exception e) {
-//				// Code the part where the server's down and you're sending the info it
-//				JOptionPane.showMessageDialog(null, "Restart application or call IT.", "Connection to server lost.", JOptionPane.ERROR_MESSAGE);
-//				e.printStackTrace();
-//			}
+			String command = "cscript.exe newUsers.vbs";
 			
+			try {
+				p = Runtime.getRuntime().exec(command);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				JOptionPane.showMessageDialog(clientWindow, e.toString());
+			}
 			// Clear the form when we're done and expect a gui interface to send us a link to the pdf of the form
 			clearForm();
 		}	
