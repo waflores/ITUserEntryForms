@@ -4,6 +4,8 @@ import java.awt.event.ActionListener;
 import java.io.*;
 
 import javax.swing.*;
+
+import sun.misc.BASE64Decoder;
 import helpertools.*;
 
 @SuppressWarnings({ "unused" })
@@ -12,6 +14,9 @@ public class ITUserInputProgram implements ActionListener {
 	private JFrame clientWindow = new JFrame("New User Input Client");
 	private JPanel mainPanel = new JPanel();
 	private JPanel bottomPanel = new JPanel();
+	
+	private JMenu monitorOption; // view
+	private JMenuItem adminDatabaseItem;
 	
 	/* Radiobuttons */
 	private JRadioButton regEmp = new JRadioButton("Regular", true); // when active
@@ -33,7 +38,6 @@ public class ITUserInputProgram implements ActionListener {
 	private JLabel empTitle = new JLabel ("Title: ");
 	private JLabel empManager = new JLabel("Manager: ");
 	private JLabel empDept = new JLabel ("Department: ");
-	private JLabel empID = new JLabel ("Diosynth Employee ID: ");
 	private JLabel empStatus = new JLabel ("Employee Status: ");
 	
 	/* Text fields */
@@ -41,12 +45,10 @@ public class ITUserInputProgram implements ActionListener {
 	private JTextField firstNametxt = new JTextField (8);
 	private JTextField midNametxt = new JTextField(8);
 	private JTextField prefNametxt = new JTextField(8);
-//	private JTextField empLocationtxt = new JTextField(8);
 	private JTextField empStartDatetxt = new JTextField(8);
 	private JTextField empTitletxt = new JTextField (8);
 	private JTextField empManagertxt = new JTextField(8);
 	private JTextField empDepttxt = new JTextField (8);
-	private JTextField empIDtxt = new JTextField (8);
 	
 	/* Selection Items */
 	private String[] comboBoxItem = {"THC", "RTP", "WES", "KCL", "D&I"};
@@ -56,7 +58,6 @@ public class ITUserInputProgram implements ActionListener {
 	private JButton submitButton = new JButton("Submit");
 	private JButton clearButton = new JButton("Clear Form");
 	private JButton selectDate = new JButton("Select Date");
-//	private JButton windowSizeButton = new JButton("WindowSize");	
 	
 	public ITUserInputProgram(String serverAddress) throws Exception {
 		/* Start building GUI */
@@ -66,7 +67,6 @@ public class ITUserInputProgram implements ActionListener {
 		
 		
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-//		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 		
 		// Start adding things to the gui
 		mainPanel.add(firstName);
@@ -77,8 +77,8 @@ public class ITUserInputProgram implements ActionListener {
 		mainPanel.add(lastNametxt);
 		mainPanel.add(prefName);
 		mainPanel.add(prefNametxt);
-		mainPanel.add(empID);
-		mainPanel.add(empIDtxt);
+		//mainPanel.add(empID);
+		//mainPanel.add(empIDtxt);
 		mainPanel.add(empTitle);
 		mainPanel.add(empTitletxt);
 		mainPanel.add(empManager);
@@ -87,28 +87,15 @@ public class ITUserInputProgram implements ActionListener {
 		mainPanel.add(empLoc); // a dropdown menu
 		mainPanel.add(empDept);
 		mainPanel.add(empDepttxt);
-//		mainPanel.add(empStartDate);
-//		mainPanel.add(empStartDatetxt);
 		empStartDatetxt.setEditable(false); // Just display whatever the user chooses as a date
-//		mainPanel.add(selectDate); // Instantiate datePicker
-//		selectDate.addActionListener(this);
-		
-//		rightPanel.add(Box.createHorizontalStrut(15)); // create some space in the GUI
 		mainPanel.add(Box.createHorizontalStrut(5));
 		
-//		mainPanel.add(empRehire);
-//		mainPanel.add(empIsNotRehire);
-//		mainPanel.add(empIsRehire);	
 		mainPanel.add(Box.createHorizontalStrut(15)); // create some space in the GUI
-//		mainPanel.add(empStatus);
-//		mainPanel.add(regEmp);
-//		mainPanel.add(tempContract);
+		createMonitorMenu();
+		JMenuBar menuBar = new JMenuBar();
+		clientWindow.setJMenuBar(menuBar);
 		
-		// radio button functionality
-//		btnGroup1.add(regEmp);
-//		btnGroup1.add(tempContract);
-//		btnGroup2.add(empIsNotRehire);
-//		btnGroup2.add(empIsRehire);
+		menuBar.add(monitorOption);
 		
 		// Form Buttons
 		bottomPanel.add(clearButton);
@@ -116,17 +103,9 @@ public class ITUserInputProgram implements ActionListener {
 		bottomPanel.add(submitButton);
 		submitButton.addActionListener(this);
 		
-		// For diagnostic purposes
-//		windowSizeButton.addActionListener(this);
-//		windowSizeButton.setMnemonic(KeyEvent.VK_ENTER);
-//		bottomPanel.add(windowSizeButton);
-//		windowSizeButton.setVisible(false);
-		
 		/* Window Attributes */
 		clientWindow.setSize(300, 610);
 		clientWindow.setVisible(true);
-//		clientWindow.setResizable(false);
-//		clientWindow.setLocation(250, 250);
 		clientWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
@@ -134,7 +113,6 @@ public class ITUserInputProgram implements ActionListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		//String whereToConnect = JOptionPane.showInputDialog("Where to connect?", "localhost");
 			try {
 				new ITUserInputProgram(null);
 			} catch (Exception e) {
@@ -168,29 +146,8 @@ public class ITUserInputProgram implements ActionListener {
 						, JOptionPane.PLAIN_MESSAGE);
 			}
 		}
-//		if(ae.getSource() == windowSizeButton) {
-//			Dimension dim = clientWindow.getSize();
-//			System.out.println(dim);
-//		}
-//		if (ae.getSource() == selectDate) {
-//			empStartDatetxt.setText(new DatePicker(clientWindow).setPickedDate());
-//		}
-//		if (ae.getSource() == EsubmitBtn){
-//			final String user = emailField.getText();
-//			char[] pass = passwordField.getPassword();
-//	
-//			// Get authentication
-//			try {
-//				oos.writeObject(new RequestAuth(user, pass, this.filename));
-//				emailFrame.dispose();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				JOptionPane.showMessageDialog(clientWindow, e.toString());
-//			}
-//		}
-		
-		
 	}
+	
 	private void processUser () {
 		
 		/* Get the input from the form */
@@ -203,17 +160,15 @@ public class ITUserInputProgram implements ActionListener {
 		String emp_title = empTitletxt.getText().trim();
 		String emp_manager = empManagertxt.getText().trim();
 		String emp_dept = empDepttxt.getText().trim();
-		String emp_ID = empIDtxt.getText().trim();
 		boolean emp_rehire = empIsRehire.isSelected();
 		boolean emp_reg = regEmp.isSelected();
 		
-		if (f_name.length() == 0 || l_name.length() == 0 || emp_ID.length() == 0 || emp_title.length() == 0) {
+		if (f_name.length() == 0 || l_name.length() == 0 || emp_title.length() == 0) {
 			JOptionPane.showMessageDialog(clientWindow, "First name, Last Name, Employee ID, and Title need to be filled in!");
 		}
 		else { 
 			Process p;
-			
-			String command = "cscript.exe newUsers.vbs";
+			String command = "cscript.exe " + "newUsers.vbs";
 			
 			try {
 				p = Runtime.getRuntime().exec(command);
@@ -236,8 +191,16 @@ public class ITUserInputProgram implements ActionListener {
 		empTitletxt.setText("");
 		empManagertxt.setText("");
 		empDepttxt.setText("");
-		empIDtxt.setText("");
 		regEmp.setSelected(true);
 		empIsNotRehire.setSelected(true);
 	}
+	
+	private void createMonitorMenu() { // view different programs
+		monitorOption = new JMenu("View");
+		
+		adminDatabaseItem = new JMenuItem("Administer Form Database");
+		adminDatabaseItem.addActionListener(this);
+		monitorOption.add(adminDatabaseItem);
+	}
+	
 }
